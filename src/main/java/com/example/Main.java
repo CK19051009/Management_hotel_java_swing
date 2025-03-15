@@ -192,7 +192,7 @@ public class Main {
                     switch (choiceRoom) {
                         case 1:
                             System.out.println("List rooms"); {
-                            List<Room> rooms = RoomsController.listRooms();
+                            List<Room> rooms = roomsController.listRooms();
                             if (rooms != null) {
                                 for (Room room : rooms) {
                                     System.out.println(room);

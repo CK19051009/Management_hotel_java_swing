@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.config.DBconnection;
+import com.example.models.Employee;
 import com.example.models.Room;
 
 public class RoomsController {
-    public static List<Room> listRooms() {
+    public List<Room> listRooms() {
         List<Room> rooms = new ArrayList<Room>();
         String query = "SELECT * FROM rooms where isDeleted = 0";
         try (Connection conn = DBconnection.getConnection();
@@ -36,5 +37,25 @@ public class RoomsController {
             e.printStackTrace();
         }
         return rooms;
+    }
+
+    public Boolean createRoom(Room room) {
+        String query = "INSERT INTO employees (roomNumber, type, status, price, description, capacity, position, thumbnail) VALUES (?, ?, ?, ?, ?, ?, ?,?)";
+        try (Connection conn = DBconnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, room.getRoomNumber());
+            pstmt.setString(2, room.getRoomType());
+            pstmt.setString(3, room.getStatus());
+            pstmt.setInt(4, room.getPrice());
+            pstmt.setString(5, room.getDescription());
+            pstmt.setString(6, room.getCapacity());
+            pstmt.setInt(7, room.getPosition());
+            pstmt.setString(8, room.getThumbnail());
+            int rs = pstmt.executeUpdate();
+            return rs > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
