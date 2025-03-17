@@ -105,6 +105,7 @@ public class RoomsController {
                 service.setPrice(rs.getDouble("price"));
                 service.setDescription(rs.getString("description"));
                 service.setStatus(rs.getString("status"));
+                service.setQuantity(rs.getInt("quantity"));
                 services.add(service);
             }
 

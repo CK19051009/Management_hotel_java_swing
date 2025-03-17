@@ -6,6 +6,7 @@ public class Service {
     private double price;
     private String description;
     private String status = "available";
+    private int quantity;
 
     public Service() {
     }
@@ -17,12 +18,13 @@ public class Service {
         this.status = status;
     }
 
-    public Service(int id, String name, double price, String description, String status) {
+    public Service(int id, String name, double price, String description, String status, int quantity) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.description = description;
         this.status = status;
+        this.quantity = quantity;
     }
 
     public int getId() {
@@ -67,8 +69,16 @@ public class Service {
 
     @Override
     public String toString() {
-        return "Service [id=" + id + ", name=" + name + ", price=" + price + ", description=" + description
-                + ", status=" + status + "]";
+        return "Service " + "id = " + id + " name = " + name + " price = " + price + " description = " + description
+                + " status = " + status + ", quantity = " + quantity + "\n";
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
 }

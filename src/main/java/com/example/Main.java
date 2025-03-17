@@ -263,6 +263,7 @@ public class Main {
                             Room room = roomsController.roomDetail(id);
                             if (room != null) {
                                 System.out.println(room);
+                                System.out.println("-----------------");
                                 System.out.println("Services: " + room.getServices());
                             } else {
                                 System.out.println("Room not exist!");

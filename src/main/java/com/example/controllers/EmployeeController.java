@@ -11,6 +11,8 @@ import com.example.config.DBconnection;
 import com.example.models.Employee;
 
 public class EmployeeController {
+
+    // Đăng nhập
     public Employee login(String email, String password) {
         Employee employee = null;
         String query = "SELECT * FROM employees WHERE email = ? and password = ? and  isDeleted = 0";
@@ -30,6 +32,7 @@ public class EmployeeController {
 
     }
 
+    // Kết thúc đăng nhập
     public List<Employee> listEmployee() {
         List<Employee> employees = new ArrayList<Employee>();
         String query = "SELECT * FROM employees where isDeleted = 0";

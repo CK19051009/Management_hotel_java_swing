@@ -9,6 +9,7 @@ import com.example.models.Guest;
 
 public class GuestController {
 
+    // tạo khách hàng
     public Boolean createGuest(Guest guest) {
         String query = "INSERT into guests (fullName, email, phone, address) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBconnection.getConnection();
@@ -25,4 +26,6 @@ public class GuestController {
         }
         return false;
     }
+    // kết thúc tạo khách hàng
+
 }
