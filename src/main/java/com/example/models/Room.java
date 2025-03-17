@@ -1,15 +1,18 @@
 package com.example.models;
 
+import java.util.List;
+
 public class Room {
     private int id;
     private String roomNumber;
     private String roomType;
-    private String status;
+    private String status = "available";
     private int price;
     private String thumbnail;
     private String description;
-    private String capacity;
+    private int capacity;
     private int position;
+    private List<Service> services;
 
     public int getId() {
         return id;
@@ -67,11 +70,11 @@ public class Room {
         this.description = description;
     }
 
-    public String getCapacity() {
+    public int getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(String capacity) {
+    public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
 
@@ -86,9 +89,16 @@ public class Room {
     public Room() {
     }
 
-    public Room(int id, String roomNumber, String roomType, String status, int price, String thumbnail,
-            String description, String capacity, int position) {
-        this.id = id;
+    public List<Service> getServices() {
+        return services;
+    }
+
+    public void setServices(List<Service> services) {
+        this.services = services;
+    }
+
+    public Room(String roomNumber, String roomType, String status, int price, String description,
+            int capacity, int position, String thumbnail) {
         this.roomNumber = roomNumber;
         this.roomType = roomType;
         this.status = status;
@@ -97,6 +107,19 @@ public class Room {
         this.description = description;
         this.capacity = capacity;
         this.position = position;
+    }
+
+    public Room(int id, String roomNumber, String roomType, String status, int price, String thumbnail,
+            String description, int capacity, int position) {
+        this.id = id;
+        this.roomNumber = roomNumber;
+        this.roomType = roomType;
+        this.status = status;
+        this.price = price;
+        this.description = description;
+        this.capacity = capacity;
+        this.position = position;
+        this.thumbnail = thumbnail;
     }
 
     @Override

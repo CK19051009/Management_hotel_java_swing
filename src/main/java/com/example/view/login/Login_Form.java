@@ -328,7 +328,7 @@ public class Login_Form extends javax.swing.JFrame {
                 Employee employee = employeeController.login(user, passString);
                 if (employee != null) {
                         System.out.println(employee);
-                        System.out.println(employeeController.salaryEmployee(1));
+                        
 
                 }
         }// GEN-LAST:event_buttonLoginActionPerformed

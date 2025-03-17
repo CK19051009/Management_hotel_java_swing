@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.text.StyledEditorKit.BoldAction;
-
 import com.example.config.DBconnection;
 import com.example.models.Employee;
 
@@ -107,14 +105,20 @@ public class EmployeeController {
                     return false;
                 }
             }
-
-            pstmt.setString(1, employee.getUserName());
-            pstmt.setString(2, employee.getFullName());
-            pstmt.setString(3, employee.getEmail());
-            pstmt.setString(4, employee.getPassword());
-            pstmt.setString(5, employee.getThumbnail());
-            pstmt.setString(6, employee.getLevelUser());
-            pstmt.setString(7, employee.getStatus());
+            // Lấy thông tin hiện tại của nhân viên từ cơ sở dữ liệu
+            Employee currentEmployee = detailEmployee(id);
+            if (currentEmployee == null) {
+                return false; // Nhân viên không tồn tại
+            }
+            pstmt.setString(1, employee.getUserName() != "" ? employee.getUserName() : currentEmployee.getUserName());
+            pstmt.setString(2, employee.getFullName() != "" ? employee.getFullName() : currentEmployee.getFullName());
+            pstmt.setString(3, employee.getEmail() != "" ? employee.getEmail() : currentEmployee.getEmail());
+            pstmt.setString(4, employee.getPassword() != "" ? employee.getPassword() : currentEmployee.getPassword());
+            pstmt.setString(5,
+                    employee.getThumbnail() != "" ? employee.getThumbnail() : currentEmployee.getThumbnail());
+            pstmt.setString(6,
+                    employee.getLevelUser() != "" ? employee.getLevelUser() : currentEmployee.getLevelUser());
+            pstmt.setString(7, employee.getStatus() != "" ? employee.getStatus() : currentEmployee.getStatus());
             pstmt.setInt(8, id);
             int rs = pstmt.executeUpdate();
             return rs > 0;

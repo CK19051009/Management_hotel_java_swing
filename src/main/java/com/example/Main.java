@@ -1,8 +1,10 @@
 package com.example;
 
 import com.example.controllers.EmployeeController;
+import com.example.controllers.GuestController;
 import com.example.controllers.RoomsController;
 import com.example.models.Employee;
+import com.example.models.Guest;
 import com.example.models.Room;
 
 import java.util.List;
@@ -40,6 +42,38 @@ public class Main {
         System.out.println("5.Manage Profits ");
         System.out.println("6.Manage Bills ");
         System.out.println("7. Exit");
+
+    }
+
+    public static Room inputRoom() {
+        System.out.print("Input numberRoom ");
+        String numberRoom = sc.nextLine();
+        System.out.print("Input typeRoom ");
+        String typeRoom = sc.nextLine();
+        System.out.print("Input status ");
+        String status = sc.nextLine();
+        if (!status.equals("available") && !status.equals("occupied") &&
+                !status.equals("reserved") && !status.equals("maintenance") && !status.equals("cleaning")) {
+            System.out.println("Invalid Status. Defaulting to 'available'.");
+            status = "available"; // Gán giá trị mặc định nếu không hợp lệ
+        }
+
+        System.out.print("Input price ");
+        int price = sc.nextInt();
+        System.out.print("Input description ");
+        String text = sc.nextLine();
+        System.out.print("Input capacity ");
+        int capacity = sc.nextInt();
+        System.out.print("Input positon ");
+        int position = sc.nextInt();
+        System.out.print("Input thumbnail ");
+        String thumbnail = sc.nextLine();
+        if (thumbnail.isEmpty()) {
+            thumbnail = null; // Nếu không nhập, để giá trị null
+        }
+
+        Room roomNew = new Room(numberRoom, typeRoom, status, price, text, capacity, position, thumbnail);
+        return roomNew;
 
     }
 
@@ -92,6 +126,7 @@ public class Main {
             System.out.print("Enter your choice: ");
             EmployeeController controller = new EmployeeController();
             RoomsController roomsController = new RoomsController();
+            GuestController guestController = new GuestController();
             int choice = sc.nextInt();
             switch (choice) {
                 case 1: {
@@ -107,7 +142,7 @@ public class Main {
                     int choiEmployee = sc.nextInt();
                     switch (choiEmployee) {
                         case 1:
-                            System.out.println("Create Employee");
+                            System.out.println("Create Employee"); {
 
                             Employee newEmployee = inputEmployee();
                             boolean isCreated = controller.createEmployee(newEmployee);
@@ -118,8 +153,8 @@ public class Main {
                                 System.out.println("Failed to create employee.");
                             }
                             break;
+                        }
                         case 2: {
-
                             System.out.println("Update Employee");
                             System.out.println("Input Id Employee, you want to update: ");
                             int id = sc.nextInt();
@@ -186,7 +221,8 @@ public class Main {
                     System.out.println("3.Update rooms.");
                     System.out.println("4.Delete rooms.");
                     System.out.println("5.Detail room.");
-                    System.out.println("6.Back.");
+                    System.out.println("6.Place room.");
+                    System.out.println("7.Back.");
                     System.out.print("Enter your choice: ");
                     int choiceRoom = sc.nextInt();
                     switch (choiceRoom) {
@@ -201,9 +237,19 @@ public class Main {
                         }
 
                             break;
-                        case 2:
+                        case 2: {
+
                             System.out.println("Create rooms");
+                            Room roomNew = inputRoom();
+                            Boolean isCreated = roomsController.createRoom(roomNew);
+                            if (isCreated) {
+                                System.out.println("Create room successfully!");
+                            } else {
+                                System.out.println("Failed room!");
+                            }
+
                             break;
+                        }
                         case 3:
                             System.out.println("Update rooms");
                             break;
@@ -212,10 +258,44 @@ public class Main {
                             break;
                         case 5:
                             System.out.println("Detail room");
+                            System.out.print("Input Id Room ");
+                            int id = sc.nextInt();
+                            Room room = roomsController.roomDetail(id);
+                            if (room != null) {
+                                System.out.println(room);
+                                System.out.println("Services: " + room.getServices());
+                            } else {
+                                System.out.println("Room not exist!");
+                            }
                             break;
-                        case 6:
-                            menu();
+                        case 7: {
+
+                            System.out.println("Place room");
+                            System.out.println("Giao diện tạo hóa đơn:");
+                            System.out.println("Nhập thông tin khách hàng: ");
+                            System.out.println("Nhận tên: ");
+                            String fullName = sc.nextLine();
+                            System.out.println("Nhận số điện thoại: ");
+                            String phone = sc.nextLine();
+
+                            System.out.println("Nhập địa chỉ: ");
+                            String address = sc.nextLine();
+                            System.out.println("Nhập email khách hàng: ");
+                            String email = sc.nextLine();
+                            // tạo khách hàng trong cở sở dữ liệu
+                            Guest guest = new Guest(fullName, phone, address, email);
+                            Boolean isCreated = guestController.createGuest(guest);
+                            if (isCreated) {
+                                System.out.println("Create guest successfully!");
+                            } else {
+                                System.out.println("Error!");
+                            }
+                            System.out.println("Nhập thông tin phòng: ");
+                            System.out.println("Nhập số phòng: ");
+                            String numberRoom = sc.nextLine();
+
                             break;
+                        }
                         default:
                             System.out.println("Invalid choice");
                     }
@@ -232,6 +312,7 @@ public class Main {
                     break;
                 case 6:
                     System.out.println("Manage Bills");
+
                     break;
                 case 7:
                     System.out.println("Exit");

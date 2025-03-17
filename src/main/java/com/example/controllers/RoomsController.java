@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.config.DBconnection;
-import com.example.models.Employee;
 import com.example.models.Room;
+import com.example.models.Service;
 
 public class RoomsController {
+    // Lấy danh sách phòng
     public List<Room> listRooms() {
         List<Room> rooms = new ArrayList<Room>();
         String query = "SELECT * FROM rooms where isDeleted = 0";
@@ -27,7 +28,8 @@ public class RoomsController {
                 room.setPrice(rs.getInt("price"));
                 room.setThumbnail(rs.getString("thumbnail"));
                 room.setDescription(rs.getString("description"));
-                room.setCapacity(rs.getString("capacity"));
+                room.setCapacity((rs.getInt("capacity")));
+                ;
                 room.setPosition(rs.getInt("position"));
                 rooms.add(room);
 
@@ -38,9 +40,11 @@ public class RoomsController {
         }
         return rooms;
     }
+    // end lấy ra danh sách phòng
 
+    // Tạo phòng
     public Boolean createRoom(Room room) {
-        String query = "INSERT INTO employees (roomNumber, type, status, price, description, capacity, position, thumbnail) VALUES (?, ?, ?, ?, ?, ?, ?,?)";
+        String query = "INSERT INTO rooms (roomNumber, type, status, price, description, capacity, position, thumbnail) VALUES (?, ?, ?, ?, ?, ?, ?,?)";
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, room.getRoomNumber());
@@ -48,7 +52,7 @@ public class RoomsController {
             pstmt.setString(3, room.getStatus());
             pstmt.setInt(4, room.getPrice());
             pstmt.setString(5, room.getDescription());
-            pstmt.setString(6, room.getCapacity());
+            pstmt.setInt(6, room.getCapacity());
             pstmt.setInt(7, room.getPosition());
             pstmt.setString(8, room.getThumbnail());
             int rs = pstmt.executeUpdate();
@@ -58,4 +62,60 @@ public class RoomsController {
         }
         return false;
     }
+
+    // end Tạo phòng
+    // Lấy ra phòng theo id
+    public Room roomDetail(int id) {
+        Room room = new Room();
+        String query = "SELECT * FROM rooms where id = ? and isDeleted = 0";
+
+        try (Connection conn = DBconnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                room.setId(rs.getInt("id"));
+                room.setRoomNumber(rs.getString("roomNumber"));
+                room.setRoomType(rs.getString("type"));
+                room.setStatus(rs.getString("status"));
+                room.setPrice(rs.getInt("price"));
+                room.setThumbnail(rs.getString("thumbnail"));
+                room.setDescription(rs.getString("description"));
+                room.setCapacity((rs.getInt("capacity")));
+                ;
+                room.setPosition(rs.getInt("position"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        String queryServiceRoom = """
+                select s.* , rs.quantity from services s join room_services rs on s.id = rs.serviceId where rs.roomId = ?;
+                """;
+
+        try (Connection conn = DBconnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(queryServiceRoom)) {
+            pstmt.setInt(1, id);
+            List<Service> services = new ArrayList<>();
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Service service = new Service();
+                service.setId(rs.getInt("id"));
+                service.setName(rs.getString("name"));
+                service.setPrice(rs.getDouble("price"));
+                service.setDescription(rs.getString("description"));
+                service.setStatus(rs.getString("status"));
+                services.add(service);
+            }
+
+            room.setServices(services);
+        }
+
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return room;
+    }
+    // kết thức lấy ra phòng theo id
 }
