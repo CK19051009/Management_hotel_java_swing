@@ -6,6 +6,8 @@ import com.example.controllers.RoomsController;
 import com.example.models.Employee;
 import com.example.models.Guest;
 import com.example.models.Room;
+import com.example.view.room.RoomForm;
+import com.example.view.room.RoomManagementForm;
 
 import java.util.List;
 import java.util.Scanner;
@@ -227,6 +229,9 @@ public class Main {
                     int choiceRoom = sc.nextInt();
                     switch (choiceRoom) {
                         case 1:
+                            RoomManagementForm roomManagementForm = new RoomManagementForm();
+                            roomManagementForm.setVisible(true);
+
                             System.out.println("List rooms"); {
                             List<Room> rooms = roomsController.listRooms();
                             if (rooms != null) {
