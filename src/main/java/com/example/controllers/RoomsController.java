@@ -82,7 +82,6 @@ public class RoomsController {
                 room.setThumbnail(rs.getString("thumbnail"));
                 room.setDescription(rs.getString("description"));
                 room.setCapacity((rs.getInt("capacity")));
-                ;
                 room.setPosition(rs.getInt("position"));
             }
         } catch (SQLException e) {
@@ -119,23 +118,65 @@ public class RoomsController {
         return room;
     }
     // kết thức lấy ra phòng theo id
+    
+  public Boolean updateRoom(Room room , int id) {
+    String query = "UPDATE rooms SET "
+            + "roomNumber = COALESCE(?, roomNumber), "
+            + "type = COALESCE(?, type), "
+            + "status = COALESCE(?, status), "
+            + "price = COALESCE(?, price), "
+            + "description = COALESCE(?, description), "
+            + "capacity = COALESCE(?, capacity), "
+            + "position = COALESCE(?, position), "
+            + "thumbnail = COALESCE(?, thumbnail), "
+            + "updatedAt = CURRENT_TIMESTAMP "
+            + "WHERE id = ? AND isDeleted = 0";
 
-    // Thay đổi trạng thái phòng
-    public Boolean changeStatusRoom(int roomId, String stautsInput) {
-        String query = """
-                update rooms set status = ? where id = ? ;
-                """;
-        try (Connection conn = DBconnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setString(1, stautsInput);
-            ps.setInt(2, roomId);
-            int rs = ps.executeUpdate();
-            return rs > 0;
+    try (Connection conn = DBconnection.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Room currentRoom = roomDetail(id); 
+            System.out.println(currentRoom);
+        if (currentRoom == null ) {
+            return false; 
         }
-        return false;
+
+        
+        pstmt.setString(1, (room.getRoomNumber() != null && !room.getRoomNumber().isEmpty()) ? room.getRoomNumber() : currentRoom.getRoomNumber());
+        pstmt.setString(2, (room.getRoomType() != null && !room.getRoomType().isEmpty()) ? room.getRoomType() : currentRoom.getRoomType());
+        pstmt.setString(3, (room.getStatus() != null && !room.getStatus().isEmpty()) ? room.getStatus() : currentRoom.getStatus());
+        pstmt.setObject(4, (room.getPrice() != null) ? room.getPrice() : currentRoom.getPrice(), java.sql.Types.INTEGER);
+        pstmt.setString(5, (room.getDescription() != null && !room.getDescription().isEmpty()) ? room.getDescription() : currentRoom.getDescription());
+        pstmt.setObject(6, (room.getCapacity() != null) ? room.getCapacity() : currentRoom.getCapacity(), java.sql.Types.INTEGER);
+        pstmt.setObject(7, (room.getPosition() != null) ? room.getPosition() : currentRoom.getPosition(), java.sql.Types.INTEGER);
+        pstmt.setString(8, (room.getThumbnail() != null && !room.getThumbnail().isEmpty()) ? room.getThumbnail() : currentRoom.getThumbnail());
+        pstmt.setInt(9, id);
+
+
+        int rs = pstmt.executeUpdate();
+        return rs > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
-    // kết thúc
+    return false;
+}
+
+// Xóa  phòng
+public Boolean deleteRoom(int roomId) {
+    String query = "UPDATE rooms SET isDeleted = 1, updatedAt = CURRENT_TIMESTAMP WHERE id = ? AND isDeleted = 0";
+
+    try (Connection conn = DBconnection.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+        pstmt.setInt(1, roomId);
+        int rowsAffected = pstmt.executeUpdate();
+
+        return rowsAffected > 0; 
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+ 
+
 }
