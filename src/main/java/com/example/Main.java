@@ -21,8 +21,8 @@ public class Main {
         String password = sc.nextLine();
         EmployeeController controller = new EmployeeController();
 
-        Employee employee = controller.login(email, password);
-        if (employee != null) {
+        Boolean employeeExist = controller.login(email, password);
+        if (employeeExist) {
             System.out.println("Login success");
             return true;
 
@@ -33,6 +33,27 @@ public class Main {
 
     }
 
+    public static Boolean registerForm() {
+        System.out.println("Register Form");
+        System.out.print("Enter UserName:");
+        String user = sc.nextLine();
+        System.out.print("Enter Email:");
+        String email = sc.nextLine();
+        System.out.print("Enter Password:");
+        String password = sc.nextLine();
+        EmployeeController controller = new EmployeeController();
+        Boolean created = controller.register(user, email, password);
+        if (created) {
+            System.out.println("Register success!");
+            return true;
+        } else {
+            System.out.println("Register failed!");
+            return false;
+        }
+
+    }
+
+    // Statement.RETURN_GENERATED_KEYS
     public static void menu() {
         System.out.println("Menu");
         System.out.println("1.Manage Employees ");
@@ -61,6 +82,7 @@ public class Main {
         System.out.print("Input price ");
         int price = sc.nextInt();
         System.out.print("Input description ");
+        sc.nextLine();
         String text = sc.nextLine();
         System.out.print("Input capacity ");
         int capacity = sc.nextInt();
@@ -73,6 +95,7 @@ public class Main {
         }
 
         Room roomNew = new Room(numberRoom, typeRoom, status, price, text, capacity, position, thumbnail);
+        System.out.println(roomNew.getId());
         return roomNew;
 
     }
@@ -119,208 +142,229 @@ public class Main {
     }
 
     public static void main(String args[]) {
-        Boolean isLogin = loginFrom();
-        if (isLogin) {
-            menu();
-            Scanner sc = new Scanner(System.in);
-            System.out.print("Enter your choice: ");
-            EmployeeController controller = new EmployeeController();
-            RoomsController roomsController = new RoomsController();
-            GuestController guestController = new GuestController();
-            int choice = sc.nextInt();
-            switch (choice) {
-                case 1: {
+        Scanner sc = new Scanner(System.in);
 
-                    System.out.println("Manage Employees");
-                    System.out.println("1. Create Employee");
-                    System.out.println("2. Update Employee");
-                    System.out.println("3. Delete Employee");
-                    System.out.println("4. List Employee");
-                    System.out.println("5. Detail Employee");
-                    System.out.println("6. Back");
+        System.out.println("-----Giao dien-----");
+        System.out.println("1.Login");
+        System.out.println("2.Regiter");
+        System.out.println("3.Exit");
+        System.out.print("input choose of you: ");
+        int choose = sc.nextInt();
+        switch (choose) {
+            case 1: {
+
+                Boolean isLogin = loginFrom();
+                if (isLogin) {
+                    menu();
                     System.out.print("Enter your choice: ");
-                    int choiEmployee = sc.nextInt();
-                    switch (choiEmployee) {
-                        case 1:
-                            System.out.println("Create Employee"); {
+                    EmployeeController controller = new EmployeeController();
+                    RoomsController roomsController = new RoomsController();
+                    GuestController guestController = new GuestController();
+                    int choice = sc.nextInt();
+                    switch (choice) {
+                        case 1: {
 
-                            Employee newEmployee = inputEmployee();
-                            boolean isCreated = controller.createEmployee(newEmployee);
+                            System.out.println("Manage Employees");
+                            System.out.println("1. Create Employee");
+                            System.out.println("2. Update Employee");
+                            System.out.println("3. Delete Employee");
+                            System.out.println("4. List Employee");
+                            System.out.println("5. Detail Employee");
+                            System.out.println("6. Back");
+                            System.out.print("Enter your choice: ");
+                            int choiEmployee = sc.nextInt();
+                            switch (choiEmployee) {
+                                case 1:
+                                    System.out.println("Create Employee"); {
 
-                            if (isCreated) {
-                                System.out.println("Employee created successfully!");
-                            } else {
-                                System.out.println("Failed to create employee.");
-                            }
-                            break;
-                        }
-                        case 2: {
-                            System.out.println("Update Employee");
-                            System.out.println("Input Id Employee, you want to update: ");
-                            int id = sc.nextInt();
-                            Employee employee = inputEmployee();
-                            Boolean isUpdate = controller.updateEmployee(employee, id);
-                            if (isUpdate) {
-                                System.out.println("Update successfully!");
-                            } else {
-                                System.out.println("Update failed");
-                            }
+                                    Employee newEmployee = inputEmployee();
+                                    boolean isCreated = controller.createEmployee(newEmployee);
 
-                            break;
-                        }
-                        case 3: {
-
-                            System.out.println("Delete Employee");
-                            System.out.print("Input Id employee, you want to delete.");
-                            int id = sc.nextInt();
-                            Boolean check = controller.deleteEmployee(id);
-                            if (check) {
-                                System.out.println("Delete successfully!");
-                            } else {
-                                System.out.println("Delete fall!");
-                            }
-                            break;
-                        }
-                        case 4: {
-
-                            System.out.println("List Employee");
-                            List<Employee> employees = controller.listEmployee();
-                            if (employees != null) {
-                                for (Employee employee : employees) {
-                                    System.out.println(employee);
+                                    if (isCreated) {
+                                        System.out.println("Employee created successfully!");
+                                    } else {
+                                        System.out.println("Failed to create employee.");
+                                    }
+                                    break;
                                 }
-                            }
-                            break;
-                        }
-                        case 5: {
+                                case 2: {
+                                    System.out.println("Update Employee");
+                                    System.out.println("Input Id Employee, you want to update: ");
+                                    int id = sc.nextInt();
+                                    Employee employee = inputEmployee();
+                                    Boolean isUpdate = controller.updateEmployee(employee, id);
+                                    if (isUpdate) {
+                                        System.out.println("Update successfully!");
+                                    } else {
+                                        System.out.println("Update failed");
+                                    }
 
-                            System.out.println("Detail Employee");
-                            System.out.print("Input Id Employee ");
-                            int id = sc.nextInt();
-                            Employee employee = controller.detailEmployee(id);
-                            if (employee != null) {
-                                System.out.println(employee);
-                            } else {
-                                System.out.println("Employee not exist!");
+                                    break;
+                                }
+                                case 3: {
+
+                                    System.out.println("Delete Employee");
+                                    System.out.print("Input Id employee, you want to delete.");
+                                    int id = sc.nextInt();
+                                    Boolean check = controller.deleteEmployee(id);
+                                    if (check) {
+                                        System.out.println("Delete successfully!");
+                                    } else {
+                                        System.out.println("Delete fall!");
+                                    }
+                                    break;
+                                }
+                                case 4: {
+
+                                    System.out.println("List Employee");
+                                    List<Employee> employees = controller.listEmployee();
+                                    if (employees != null) {
+                                        for (Employee employee : employees) {
+                                            System.out.println(employee);
+                                        }
+                                    }
+                                    break;
+                                }
+                                case 5: {
+
+                                    System.out.println("Detail Employee");
+                                    System.out.print("Input Id Employee ");
+                                    int id = sc.nextInt();
+                                    Employee employee = controller.detailEmployee(id);
+                                    if (employee != null) {
+                                        System.out.println(employee);
+                                    } else {
+                                        System.out.println("Employee not exist!");
+                                    }
+                                    break;
+                                }
+                                case 6:
+                                    menu();
+                                    break;
+                                default:
+                                    System.out.println("Invalid choice");
                             }
-                            break;
                         }
-                        case 6:
-                            menu();
+
                             break;
+                        case 2:
+                            System.out.println("Manage Rooms");
+                            System.out.println("1.List rooms.");
+                            System.out.println("2.Create rooms.");
+                            System.out.println("3.Update rooms.");
+                            System.out.println("4.Delete rooms.");
+                            System.out.println("5.Detail room.");
+                            System.out.println("6.Place room.");
+                            System.out.println("7.Back.");
+                            System.out.print("Enter your choice: ");
+                            int choiceRoom = sc.nextInt();
+                            switch (choiceRoom) {
+                                case 1:
+                                    System.out.println("List rooms"); {
+                                    List<Room> rooms = roomsController.listRooms();
+                                    if (rooms != null) {
+                                        for (Room room : rooms) {
+                                            System.out.println(room);
+                                        }
+                                    }
+                                }
+
+                                    break;
+                                case 2: {
+
+                                    System.out.println("Create rooms");
+                                    Room roomNew = inputRoom();
+                                    Boolean isCreated = roomsController.createRoom(roomNew);
+                                    if (isCreated) {
+                                        System.out.println("Create room successfully!");
+                                    } else {
+                                        System.out.println("Failed room!");
+                                    }
+
+                                    break;
+                                }
+                                case 3:
+                                    System.out.println("Update rooms");
+                                    break;
+                                case 4:
+                                    System.out.println("Delete rooms");
+                                    break;
+                                case 5:
+                                    System.out.println("Detail room");
+                                    System.out.print("Input Id Room ");
+                                    int id = sc.nextInt();
+                                    Room room = roomsController.roomDetail(id);
+                                    if (room != null) {
+                                        System.out.println(room);
+                                        System.out.println("-----------------");
+                                        System.out.println("Services: " + room.getServices());
+                                    } else {
+                                        System.out.println("Room not exist!");
+                                    }
+                                    break;
+                                case 7: {
+
+                                    System.out.println("Place room");
+                                    System.out.println("Giao diện tạo hóa đơn:");
+                                    System.out.println("Nhập thông tin khách hàng: ");
+                                    System.out.println("Nhận tên: ");
+                                    String fullName = sc.nextLine();
+                                    System.out.println("Nhận số điện thoại: ");
+                                    String phone = sc.nextLine();
+
+                                    System.out.println("Nhập địa chỉ: ");
+                                    String address = sc.nextLine();
+                                    System.out.println("Nhập email khách hàng: ");
+                                    String email = sc.nextLine();
+                                    // tạo khách hàng trong cở sở dữ liệu
+                                    Guest guest = new Guest(fullName, phone, address, email);
+                                    Boolean isCreated = guestController.createGuest(guest);
+                                    if (isCreated) {
+                                        System.out.println("Create guest successfully!");
+                                    } else {
+                                        System.out.println("Error!");
+                                    }
+                                    System.out.println("Nhập thông tin phòng: ");
+                                    System.out.println("Nhập số phòng: ");
+                                    String numberRoom = sc.nextLine();
+
+                                    break;
+                                }
+                                default:
+                                    System.out.println("Invalid choice");
+                            }
+
+                            break;
+                        case 3:
+                            System.out.println("Manage Services");
+                            break;
+                        case 4:
+                            System.out.println("Manage Customers");
+                            break;
+                        case 5:
+                            System.out.println("Manage Profits");
+                            break;
+                        case 6:
+                            System.out.println("Manage Bills");
+
+                            break;
+                        case 7:
+                            System.out.println("Exit");
+                            return;
                         default:
                             System.out.println("Invalid choice");
                     }
                 }
-
-                    break;
-                case 2:
-                    System.out.println("Manage Rooms");
-                    System.out.println("1.List rooms.");
-                    System.out.println("2.Create rooms.");
-                    System.out.println("3.Update rooms.");
-                    System.out.println("4.Delete rooms.");
-                    System.out.println("5.Detail room.");
-                    System.out.println("6.Place room.");
-                    System.out.println("7.Back.");
-                    System.out.print("Enter your choice: ");
-                    int choiceRoom = sc.nextInt();
-                    switch (choiceRoom) {
-                        case 1:
-                            System.out.println("List rooms"); {
-                            List<Room> rooms = roomsController.listRooms();
-                            if (rooms != null) {
-                                for (Room room : rooms) {
-                                    System.out.println(room);
-                                }
-                            }
-                        }
-
-                            break;
-                        case 2: {
-
-                            System.out.println("Create rooms");
-                            Room roomNew = inputRoom();
-                            Boolean isCreated = roomsController.createRoom(roomNew);
-                            if (isCreated) {
-                                System.out.println("Create room successfully!");
-                            } else {
-                                System.out.println("Failed room!");
-                            }
-
-                            break;
-                        }
-                        case 3:
-                            System.out.println("Update rooms");
-                            break;
-                        case 4:
-                            System.out.println("Delete rooms");
-                            break;
-                        case 5:
-                            System.out.println("Detail room");
-                            System.out.print("Input Id Room ");
-                            int id = sc.nextInt();
-                            Room room = roomsController.roomDetail(id);
-                            if (room != null) {
-                                System.out.println(room);
-                                System.out.println("-----------------");
-                                System.out.println("Services: " + room.getServices());
-                            } else {
-                                System.out.println("Room not exist!");
-                            }
-                            break;
-                        case 7: {
-
-                            System.out.println("Place room");
-                            System.out.println("Giao diện tạo hóa đơn:");
-                            System.out.println("Nhập thông tin khách hàng: ");
-                            System.out.println("Nhận tên: ");
-                            String fullName = sc.nextLine();
-                            System.out.println("Nhận số điện thoại: ");
-                            String phone = sc.nextLine();
-
-                            System.out.println("Nhập địa chỉ: ");
-                            String address = sc.nextLine();
-                            System.out.println("Nhập email khách hàng: ");
-                            String email = sc.nextLine();
-                            // tạo khách hàng trong cở sở dữ liệu
-                            Guest guest = new Guest(fullName, phone, address, email);
-                            Boolean isCreated = guestController.createGuest(guest);
-                            if (isCreated) {
-                                System.out.println("Create guest successfully!");
-                            } else {
-                                System.out.println("Error!");
-                            }
-                            System.out.println("Nhập thông tin phòng: ");
-                            System.out.println("Nhập số phòng: ");
-                            String numberRoom = sc.nextLine();
-
-                            break;
-                        }
-                        default:
-                            System.out.println("Invalid choice");
-                    }
-
-                    break;
-                case 3:
-                    System.out.println("Manage Services");
-                    break;
-                case 4:
-                    System.out.println("Manage Customers");
-                    break;
-                case 5:
-                    System.out.println("Manage Profits");
-                    break;
-                case 6:
-                    System.out.println("Manage Bills");
-
-                    break;
-                case 7:
-                    System.out.println("Exit");
-                    return;
-                default:
-                    System.out.println("Invalid choice");
             }
+                break;
+            case 2:
+                registerForm();
+                break;
+            case 3:
+                return;
+
+            default:
+                break;
         }
 
     }

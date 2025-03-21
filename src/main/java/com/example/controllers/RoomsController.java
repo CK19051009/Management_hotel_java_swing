@@ -119,4 +119,23 @@ public class RoomsController {
         return room;
     }
     // kết thức lấy ra phòng theo id
+
+    // Thay đổi trạng thái phòng
+    public Boolean changeStatusRoom(int roomId, String stautsInput) {
+        String query = """
+                update rooms set status = ? where id = ? ;
+                """;
+        try (Connection conn = DBconnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, stautsInput);
+            ps.setInt(2, roomId);
+            int rs = ps.executeUpdate();
+            return rs > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    // kết thúc
 }
