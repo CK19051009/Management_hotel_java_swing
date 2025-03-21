@@ -3,7 +3,7 @@ package com.example.models;
 public class Service {
     private int id;
     private String name;
-    private double price;
+    private Double price;
     private String description;
     private String status = "available";
     private int quantity;
@@ -11,7 +11,7 @@ public class Service {
     public Service() {
     }
 
-    public Service(String name, double price, String description, String status) {
+    public Service(String name, Double price, String description, String status) {
         this.name = name;
         this.price = price;
         this.description = description;
@@ -43,11 +43,11 @@ public class Service {
         this.name = name;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

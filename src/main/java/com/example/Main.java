@@ -57,10 +57,11 @@ public class Main {
             System.out.println("Invalid Status. Defaulting to 'available'.");
             status = "available"; // Gán giá trị mặc định nếu không hợp lệ
         }
-
         System.out.print("Input price ");
         int price = sc.nextInt();
         System.out.print("Input description ");
+        sc.nextLine();
+        
         String text = sc.nextLine();
         System.out.print("Input capacity ");
         int capacity = sc.nextInt();
@@ -75,6 +76,18 @@ public class Main {
         Room roomNew = new Room(numberRoom, typeRoom, status, price, text, capacity, position, thumbnail);
         return roomNew;
 
+    }
+    public static Guest inputGuest (){
+        System.out.print("Input name ");
+        String name = sc.nextLine();
+        System.out.print("Input phone ");
+        String phone = sc.nextLine();
+        System.out.print("Input email ");
+        String email = sc.nextLine();
+        System.out.print("Input address ");
+        String address = sc.nextLine();
+        Guest guestNew = new Guest(name, phone, address ,email);
+        return guestNew;
     }
 
     public static Employee inputEmployee() {
@@ -251,8 +264,21 @@ public class Main {
                             break;
                         }
                         case 3:
-                            System.out.println("Update rooms");
-                            break;
+                            {
+                                System.out.println("Update rooms");
+                                System.out.print("code room");
+                                int codeRoom = sc.nextInt();
+                                sc.nextLine();
+                                Room roomUpdate = inputRoom();
+                                Boolean isUpdated = roomsController.updateRoom(roomUpdate , codeRoom);
+                                if (isUpdated) {
+                                    System.out.println("successfully");
+                                }
+                                else{
+                                    System.out.println("Error!");
+                                }
+                                break;
+                            }
                         case 4:
                             System.out.println("Delete rooms");
                             break;
@@ -306,7 +332,74 @@ public class Main {
                     System.out.println("Manage Services");
                     break;
                 case 4:
-                    System.out.println("Manage Customers");
+                    System.out.println("Manage customers");
+                    System.out.println("1.List customers.");
+                    System.out.println("2.Create customer.");
+                    System.out.println("3.Update customer.");
+                    System.out.println("4.Delete customer.");
+                    System.out.println("5.Detail customer.");
+                    System.out.println("6.Place customer.");
+                    System.out.println("7.Back.");
+                    System.out.print("Enter your choice: ");
+                    int choiceCustomer = sc.nextInt();
+                    switch (choiceCustomer) {
+                        case 1:
+                            {
+                                System.out.println("List customers.");
+                                List<Guest> listGuest = guestController.getAllGuests();
+                                if(listGuest.size() == 0){
+                                    System.out.println("List customer is empty!");
+                                }
+                                for(Guest guest : listGuest){
+                                    System.out.println(guest);
+                                }
+                                
+                                break;
+
+                            }
+                        case 2:
+                        {
+                            System.out.println("Create customer.");
+                            Guest guest = inputGuest();
+                            if (guestController.createGuest(guest)) {
+                                System.out.println("Create guest successfully！");
+                            }
+                            else{
+                                System.out.println("Create guest failed！");
+                            }
+                            break;
+                        }
+                        case 3: {
+                            System.out.print("Input customer code: ");
+                            int customerCode = sc.nextInt();
+                            Guest guest = inputGuest();
+                            Boolean isUpdated = guestController.updateGuest(guest, customerCode);
+                            if(isUpdated){
+                                System.out.println("Update customer successfully!");
+                            }
+                            else{
+                                System.out.println("Update error!");
+                            }
+
+
+                            break;
+                        }
+                        case 5: {
+                            System.out.print("Input customer code: ");
+                            int customerCode = sc.nextInt();
+                            Guest guest = guestController.getGuestById(customerCode);
+                            if(guest != null){
+                                System.out.println(guest);
+                            }
+                            else{
+                                System.out.println("Not exist!");
+                            } 
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+
                     break;
                 case 5:
                     System.out.println("Manage Profits");

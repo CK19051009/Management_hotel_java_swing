@@ -7,11 +7,11 @@ public class Room {
     private String roomNumber;
     private String roomType;
     private String status = "available";
-    private int price;
+    private Integer price;
     private String thumbnail;
     private String description;
-    private int capacity;
-    private int position;
+    private Integer capacity;
+    private Integer position;
     private List<Service> services;
 
     public int getId() {
@@ -46,11 +46,11 @@ public class Room {
         this.status = status;
     }
 
-    public int getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
@@ -70,19 +70,19 @@ public class Room {
         this.description = description;
     }
 
-    public int getCapacity() {
+    public Integer getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(int capacity) {
+    public void setCapacity(Integer capacity) {
         this.capacity = capacity;
     }
 
-    public int getPosition() {
+    public Integer getPosition() {
         return position;
     }
 
-    public void setPosition(int position) {
+    public void setPosition(Integer position) {
         this.position = position;
     }
 
