@@ -7,32 +7,65 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import com.example.config.DBconnection;
 import com.example.models.Employee;
 
 public class EmployeeController {
 
     // Đăng nhập
-    public Employee login(String email, String password) {
-        Employee employee = null;
-        String query = "SELECT * FROM employees WHERE email = ? and password = ? and  isDeleted = 0";
+    public Boolean login(String email, String Inputpassword) {
+
+        String query = "SELECT * FROM employees WHERE email = ? and  isDeleted = 0";
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, email);
-            pstmt.setString(2, password);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                employee = new Employee(email, password);
+                String passwordDatabase = rs.getString("password");
+                if (BCrypt.checkpw(Inputpassword, passwordDatabase)) {
+                    return true;
+                } else {
+                    System.out.println("Sai mật khẩu!");
+                }
+            } else {
+                System.out.println("Người dùng không tồn tại!");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return employee;
+        return false;
 
     }
 
     // Kết thúc đăng nhập
+    // Đăng ký
+    public Boolean register(String userInput, String emailInput, String passInput) {
+        String query = """
+                INSERT INTO employees (userName,email,password) values (?, ?, ?)
+                """;
+        String hashedPassword = BCrypt.hashpw(passInput, BCrypt.gensalt(12));
+        try (Connection conn = DBconnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, userInput);
+            ps.setString(2, emailInput);
+            ps.setString(3, hashedPassword);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            // Kiểm tra lỗi vi phạm ràng buộc UNIQUE
+            if (e.getSQLState().equals("23000")) { // SQLState 23000: Vi phạm ràng buộc
+                System.out.println("Email đã tồn tại trong hệ thống!");
+            } else {
+                e.printStackTrace(); // In lỗi khác
+            }
+        }
+        return false;
+    }
+
+    // Kết thúc Đăng ký
     public List<Employee> listEmployee() {
         List<Employee> employees = new ArrayList<Employee>();
         String query = "SELECT * FROM employees where isDeleted = 0";
@@ -73,12 +106,13 @@ public class EmployeeController {
 
     public Boolean createEmployee(Employee employee) {
         String query = "INSERT INTO employees (userName, fullName, email, password, thumbnail, levelUser, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String hashedPassword = BCrypt.hashpw(employee.getPassword(), BCrypt.gensalt(12));
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, employee.getUserName());
             pstmt.setString(2, employee.getFullName());
             pstmt.setString(3, employee.getEmail());
-            pstmt.setString(4, employee.getPassword());
+            pstmt.setString(4, hashedPassword);
             pstmt.setString(5, employee.getThumbnail() != null ? employee.getThumbnail() : null);
             pstmt.setString(6, employee.getLevelUser() != null ? employee.getLevelUser() : "staff");
             pstmt.setString(7, employee.getStatus() != null ? employee.getStatus() : "active");
