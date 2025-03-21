@@ -6,8 +6,6 @@ import com.example.controllers.RoomsController;
 import com.example.models.Employee;
 import com.example.models.Guest;
 import com.example.models.Room;
-import com.example.view.room.RoomForm;
-import com.example.view.room.RoomManagementForm;
 
 import java.util.List;
 import java.util.Scanner;
@@ -245,11 +243,13 @@ public class Main {
                                     break;
                                 default:
                                     System.out.println("Invalid choice");
+                                    break;
                             }
+                            break;
                         }
 
-                            break;
-                        case 2:
+                        case 2: {
+
                             System.out.println("Manage Rooms");
                             System.out.println("1.List rooms.");
                             System.out.println("2.Create rooms.");
@@ -334,9 +334,11 @@ public class Main {
                                 }
                                 default:
                                     System.out.println("Invalid choice");
+                                    break;
                             }
 
                             break;
+                        }
                         case 3:
                             System.out.println("Manage Services");
                             break;
@@ -355,124 +357,12 @@ public class Main {
                             return;
                         default:
                             System.out.println("Invalid choice");
+                            break;
                     }
+
                 }
-<<<<<<< HEAD
-
-                    break;
-                case 2:
-                    System.out.println("Manage Rooms");
-                    System.out.println("1.List rooms.");
-                    System.out.println("2.Create rooms.");
-                    System.out.println("3.Update rooms.");
-                    System.out.println("4.Delete rooms.");
-                    System.out.println("5.Detail room.");
-                    System.out.println("6.Place room.");
-                    System.out.println("7.Back.");
-                    System.out.print("Enter your choice: ");
-                    int choiceRoom = sc.nextInt();
-                    switch (choiceRoom) {
-                        case 1:
-                            RoomManagementForm roomManagementForm = new RoomManagementForm();
-                            roomManagementForm.setVisible(true);
-
-                            System.out.println("List rooms"); {
-                            List<Room> rooms = roomsController.listRooms();
-                            if (rooms != null) {
-                                for (Room room : rooms) {
-                                    System.out.println(room);
-                                }
-                            }
-                        }
-
-                            break;
-                        case 2: {
-
-                            System.out.println("Create rooms");
-                            Room roomNew = inputRoom();
-                            Boolean isCreated = roomsController.createRoom(roomNew);
-                            if (isCreated) {
-                                System.out.println("Create room successfully!");
-                            } else {
-                                System.out.println("Failed room!");
-                            }
-
-                            break;
-                        }
-                        case 3:
-                            System.out.println("Update rooms");
-                            break;
-                        case 4:
-                            System.out.println("Delete rooms");
-                            break;
-                        case 5:
-                            System.out.println("Detail room");
-                            System.out.print("Input Id Room ");
-                            int id = sc.nextInt();
-                            Room room = roomsController.roomDetail(id);
-                            if (room != null) {
-                                System.out.println(room);
-                                System.out.println("-----------------");
-                                System.out.println("Services: " + room.getServices());
-                            } else {
-                                System.out.println("Room not exist!");
-                            }
-                            break;
-                        case 7: {
-
-                            System.out.println("Place room");
-                            System.out.println("Giao diện tạo hóa đơn:");
-                            System.out.println("Nhập thông tin khách hàng: ");
-                            System.out.println("Nhận tên: ");
-                            String fullName = sc.nextLine();
-                            System.out.println("Nhận số điện thoại: ");
-                            String phone = sc.nextLine();
-
-                            System.out.println("Nhập địa chỉ: ");
-                            String address = sc.nextLine();
-                            System.out.println("Nhập email khách hàng: ");
-                            String email = sc.nextLine();
-                            // tạo khách hàng trong cở sở dữ liệu
-                            Guest guest = new Guest(fullName, phone, address, email);
-                            Boolean isCreated = guestController.createGuest(guest);
-                            if (isCreated) {
-                                System.out.println("Create guest successfully!");
-                            } else {
-                                System.out.println("Error!");
-                            }
-                            System.out.println("Nhập thông tin phòng: ");
-                            System.out.println("Nhập số phòng: ");
-                            String numberRoom = sc.nextLine();
-
-                            break;
-                        }
-                        default:
-                            System.out.println("Invalid choice");
-                    }
-
-                    break;
-                case 3:
-                    System.out.println("Manage Services");
-                    break;
-                case 4:
-                    System.out.println("Manage Customers");
-                    break;
-                case 5:
-                    System.out.println("Manage Profits");
-                    break;
-                case 6:
-                    System.out.println("Manage Bills");
-
-                    break;
-                case 7:
-                    System.out.println("Exit");
-                    return;
-                default:
-                    System.out.println("Invalid choice");
-=======
->>>>>>> nhanh-cua-kiet
-            }
                 break;
+            }
             case 2:
                 registerForm();
                 break;
