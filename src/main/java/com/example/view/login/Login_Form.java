@@ -3,6 +3,7 @@ package com.example.view.login;
 import com.example.controllers.EmployeeController;
 import com.example.models.Employee;
 // import com.example.view.room.Calculator_frame;
+import com.example.view.default_main.MainDefault;
 
 /**
  *
@@ -325,10 +326,13 @@ public class Login_Form extends javax.swing.JFrame {
                 char[] passArray = pass.getPassword();
                 String passString = new String(passArray);
                 EmployeeController employeeController = new EmployeeController();
-                Employee employee = employeeController.login(user, passString);
-                if (employee != null) {
-                        System.out.println(employee);
-                        
+                Boolean employee = employeeController.login(user, passString);
+                if (employee) {
+                        System.out.println("Đăng nhập thành công");
+
+                        MainDefault mainDefault = new MainDefault();
+                        mainDefault.setVisible(true);
+                        dispose();
 
                 }
         }// GEN-LAST:event_buttonLoginActionPerformed

@@ -4,10 +4,10 @@ import java.util.List;
 
 public class Room {
     private int id;
-    private String roomNumber;
+    private int roomNumber;
     private String roomType;
     private String status = "available";
-    private Integer price;
+    private double price;
     private String thumbnail;
     private String description;
     private Integer capacity;
@@ -22,11 +22,11 @@ public class Room {
         this.id = id;
     }
 
-    public String getRoomNumber() {
+    public int getRoomNumber() {
         return roomNumber;
     }
 
-    public void setRoomNumber(String roomNumber) {
+    public void setRoomNumber(int roomNumber) {
         this.roomNumber = roomNumber;
     }
 
@@ -46,11 +46,11 @@ public class Room {
         this.status = status;
     }
 
-    public Integer getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
@@ -97,7 +97,7 @@ public class Room {
         this.services = services;
     }
 
-    public Room(String roomNumber, String roomType, String status, int price, String description,
+    public Room(int roomNumber, String roomType, String status, double price, String description,
             int capacity, int position, String thumbnail) {
         this.roomNumber = roomNumber;
         this.roomType = roomType;
@@ -109,7 +109,7 @@ public class Room {
         this.position = position;
     }
 
-    public Room(int id, String roomNumber, String roomType, String status, int price, String thumbnail,
+    public Room(int id, int roomNumber, String roomType, String status, double price, String thumbnail,
             String description, int capacity, int position) {
         this.id = id;
         this.roomNumber = roomNumber;

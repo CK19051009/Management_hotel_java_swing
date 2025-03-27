@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,16 +109,28 @@ public class EmployeeController {
         String query = "INSERT INTO employees (userName, fullName, email, password, thumbnail, levelUser, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String hashedPassword = BCrypt.hashpw(employee.getPassword(), BCrypt.gensalt(12));
         try (Connection conn = DBconnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(query)) {
+                PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, employee.getUserName());
             pstmt.setString(2, employee.getFullName());
             pstmt.setString(3, employee.getEmail());
-            pstmt.setString(4,hashedPassword);
-            pstmt.setString(5, employee.getThumbnail() != null && !employee.getThumbnail().isEmpty() ? employee.getThumbnail() : null);
-            pstmt.setString(6, employee.getLevelUser() != null && !employee.getLevelUser().isEmpty()  ? employee.getLevelUser() : "staff");
-            pstmt.setString(7, employee.getStatus() != null && !employee.getStatus().isEmpty() ? employee.getStatus() : "active");
-            int rs = pstmt.executeUpdate();
-            return rs > 0;
+            pstmt.setString(4, hashedPassword);
+            pstmt.setString(5,
+                    employee.getThumbnail() != null && !employee.getThumbnail().isEmpty() ? employee.getThumbnail()
+                            : null);
+            pstmt.setString(6,
+                    employee.getLevelUser() != null && !employee.getLevelUser().isEmpty() ? employee.getLevelUser()
+                            : "staff");
+            pstmt.setString(7,
+                    employee.getStatus() != null && !employee.getStatus().isEmpty() ? employee.getStatus() : "active");
+
+            int createGuest = pstmt.executeUpdate();
+            if (createGuest > 0) {
+                ResultSet rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    employee.setId(rs.getInt(1)); // Lấy ID tự động sinh
+                }
+                return true;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -147,15 +160,25 @@ public class EmployeeController {
             if (currentEmployee == null) {
                 return false; // Nhân viên không tồn tại
             }
-            pstmt.setString(1, employee.getUserName() != null && !employee.getUserName().isEmpty() ? employee.getUserName() : currentEmployee.getUserName());
-            pstmt.setString(2, employee.getFullName() != null && !employee.getFullName().isEmpty() ? employee.getFullName() : currentEmployee.getFullName());
-            pstmt.setString(3, employee.getEmail() != null && !employee.getEmail().isEmpty() ? employee.getEmail() : currentEmployee.getEmail());
-            pstmt.setString(4, employee.getPassword() != null && !employee.getPassword().isEmpty() ? employee.getPassword() : currentEmployee.getPassword());
+            pstmt.setString(1,
+                    employee.getUserName() != null && !employee.getUserName().isEmpty() ? employee.getUserName()
+                            : currentEmployee.getUserName());
+            pstmt.setString(2,
+                    employee.getFullName() != null && !employee.getFullName().isEmpty() ? employee.getFullName()
+                            : currentEmployee.getFullName());
+            pstmt.setString(3, employee.getEmail() != null && !employee.getEmail().isEmpty() ? employee.getEmail()
+                    : currentEmployee.getEmail());
+            pstmt.setString(4,
+                    employee.getPassword() != null && !employee.getPassword().isEmpty() ? employee.getPassword()
+                            : currentEmployee.getPassword());
             pstmt.setString(5,
-                    employee.getThumbnail() != null && !employee.getThumbnail().isEmpty() ? employee.getThumbnail() : currentEmployee.getThumbnail());
+                    employee.getThumbnail() != null && !employee.getThumbnail().isEmpty() ? employee.getThumbnail()
+                            : currentEmployee.getThumbnail());
             pstmt.setString(6,
-                    employee.getLevelUser() != null && !employee.getLevelUser().isEmpty() ? employee.getLevelUser() : currentEmployee.getLevelUser());
-            pstmt.setString(7, employee.getStatus() != null && !employee.getStatus().isEmpty() ? employee.getStatus() : currentEmployee.getStatus());
+                    employee.getLevelUser() != null && !employee.getLevelUser().isEmpty() ? employee.getLevelUser()
+                            : currentEmployee.getLevelUser());
+            pstmt.setString(7, employee.getStatus() != null && !employee.getStatus().isEmpty() ? employee.getStatus()
+                    : currentEmployee.getStatus());
             pstmt.setInt(8, id);
             int rs = pstmt.executeUpdate();
             return rs > 0;

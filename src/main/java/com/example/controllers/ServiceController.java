@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.config.DBconnection;
-import com.example.models.Guest;
 import com.example.models.Service;
+
 public class ServiceController {
-    public Boolean createService(Service  service) {
+    public Boolean createService(Service service) {
         String query = "INSERT INTO services (name, description, price, status) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBconnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, service.getName());
             pstmt.setString(2, service.getDescription());
@@ -28,13 +28,14 @@ public class ServiceController {
         }
         return false;
     }
+
     // Lấy tất cả dịch vụ
-     public List<Service> getAllService() {
+    public List<Service> getAllService() {
         List<Service> services = new ArrayList<Service>();
         String query = "SELECT * FROM services";
         try (Connection conn = DBconnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery()) {
+                PreparedStatement pstmt = conn.prepareStatement(query);
+                ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 Service service = new Service();
@@ -42,11 +43,9 @@ public class ServiceController {
                 service.setName(rs.getString("name"));
                 service.setPrice(rs.getDouble("price"));
                 service.setDescription(rs.getString("description"));
-                
                 service.setStatus(rs.getString("status"));
                 services.add(service);
 
-               
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -56,26 +55,29 @@ public class ServiceController {
 
     // Cập nhật dịch vụ
     public Boolean updateService(Service service, int id) {
-        
+
         Service currentService = getServiceById(id);
         if (currentService == null) {
-            return false; 
+            return false;
         }
 
-        String query = "UPDATE services SET name = COALESCE(?, name), " +
-                "description = COALESCE(?, description), " +
-                "price = COALESCE(?, price), " +
-                "status = COALESCE(?, status), " +
-                "updatedAt = CURRENT_TIMESTAMP " +
-                "WHERE id = ?";
-
+        String query = """
+                update services set name = COALESCE(?, name), description = COALESCE(?, description),
+                price = COALESCE(?, price),
+                status = COALESCE(?, status) where id = ?
+                """;
         try (Connection conn = DBconnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-            pstmt.setString(1, (service.getName() != null && !service.getName().isEmpty()) ? service.getName() : currentService.getName());
-            pstmt.setString(2, (service.getDescription() != null && !service.getDescription().isEmpty()) ? service.getDescription() : currentService.getDescription());
-            pstmt.setObject(3, (service.getPrice() != null) ? service.getPrice() : currentService.getPrice(), java.sql.Types.DOUBLE);
-            pstmt.setString(4, (service.getStatus() != null && !service.getStatus().isEmpty()) ? service.getStatus() : currentService.getStatus());
+            pstmt.setString(1, (service.getName() != null && !service.getName().isEmpty()) ? service.getName()
+                    : currentService.getName());
+            pstmt.setString(2,
+                    (service.getDescription() != null && !service.getDescription().isEmpty()) ? service.getDescription()
+                            : currentService.getDescription());
+            pstmt.setObject(3, (service.getPrice() != null) ? service.getPrice() : currentService.getPrice(),
+                    java.sql.Types.DOUBLE);
+            pstmt.setString(4, (service.getStatus() != null && !service.getStatus().isEmpty()) ? service.getStatus()
+                    : currentService.getStatus());
             pstmt.setInt(5, id);
 
             int rs = pstmt.executeUpdate();
@@ -85,11 +87,12 @@ public class ServiceController {
         }
         return false;
     }
+
     // Tìm dịch vụ qua id
     public Service getServiceById(int id) {
         String query = "SELECT * FROM services WHERE id = ?";
         try (Connection conn = DBconnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
 
@@ -109,19 +112,23 @@ public class ServiceController {
     }
 
     // Xóa dịch vụ, thêm biến isDeleted để ẩn đi dịch vụ hay dùng status để ẩn
-    /*public Boolean deleteService(int id) {
-        String query = "UPDATE services SET isDeleted = 1 WHERE id = ? AND isDeleted = 0";
-    
-        try (Connection conn = DBconnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-    
-            pstmt.setInt(1,id);
-            int rowsAffected = pstmt.executeUpdate();
-    
-            return rowsAffected > 0; 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    } */
+    /*
+     * public Boolean deleteService(int id) {
+     * String query =
+     * "UPDATE services SET isDeleted = 1 WHERE id = ? AND isDeleted = 0";
+     * 
+     * try (Connection conn = DBconnection.getConnection();
+     * PreparedStatement pstmt = conn.prepareStatement(query)) {
+     * 
+     * pstmt.setInt(1,id);
+     * int rowsAffected = pstmt.executeUpdate();
+     * 
+     * return rowsAffected > 0;
+     * } catch (SQLException e) {
+     * e.printStackTrace();
+     * }
+     * return false;
+     * }
+     */
+
 }

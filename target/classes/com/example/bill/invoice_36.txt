@@ -1,0 +1,14 @@
+========== HÓA ĐƠN THANH TOÁN ==========
+Mã hóa đơn: 36
+Tên khách hàng: kiet dep trai
+Số điện thoại: 
+Email: 
+Số phòng: 503
+Loại phòng: Single Room
+Ngày check-in: 2025-03-23 01:10:13.0
+Ngày check-out: null
+Số ngày thuê: 1
+Tiền thuê phòng: 430000.0 VND
+Tiền dịch vụ: 7.0 VND
+Tổng tiền phải trả: 430000.0 VND
+=========================================

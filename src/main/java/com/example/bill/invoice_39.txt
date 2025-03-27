@@ -1,0 +1,14 @@
+========== HÓA ĐƠN THANH TOÁN ==========
+Mã hóa đơn: 39
+Tên khách hàng: kiet
+Số điện thoại: 
+Email: 
+Số phòng: 501
+Loại phòng: Connecting Room
+Ngày check-in: 2025-03-23 01:24:34.0
+Ngày check-out: 2025-03-23 01:24:53.0
+Số ngày thuê: 1.0
+Tiền thuê phòng: 420000.0 VND
+Tiền dịch vụ: 0.0 VND
+Tổng tiền phải trả: 420000.0 VND
+=========================================

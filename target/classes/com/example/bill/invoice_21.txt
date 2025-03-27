@@ -1,0 +1,15 @@
+========== HÓA ĐƠN THANH TOÁN ==========
+Mã hóa đơn: 21
+Tên khách hàng: Bach tron vo
+Số điện thoại: 098543451
+Email: 
+Số phòng: 509
+Loại phòng: Family Room
+Ngày check-in: 2025-03-22 14:01:38.0
+Ngày check-out: 2025-03-23 15:35:49.0
+Số ngày thuê: 2.0
+Tiền thuê phòng: 800000.0 VND
+Tiền dịch vụ: 3000000.0 VND
+Tổng tiền giảm giá: 120000.0 VND
+Tổng tiền phải trả: 3680000.0 VND
+=========================================
