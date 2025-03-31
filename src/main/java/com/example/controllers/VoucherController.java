@@ -4,9 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.example.config.DBconnection;
 import com.example.helper.GenerateCodeVoucher;
+import com.example.models.Room;
 import com.example.models.Voucher;
 
 public class VoucherController {
@@ -71,4 +74,103 @@ public class VoucherController {
 
     }
     // hết lấy ra chi tiết 1 vouher
+
+    public List<Voucher> listVouchers() {
+        List<Voucher> vouchers = new ArrayList<Voucher>();
+        String query = "SELECT * FROM vouchers where isDeleted = 0";
+        try (Connection conn = DBconnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Voucher voucher = new Voucher();
+                voucher.setId(rs.getInt("id"));
+                voucher.setCode(rs.getString("code"));
+                voucher.setDescription(rs.getString("description"));
+                voucher.setDiscountType(rs.getString("discountType"));
+                voucher.setDiscountValue(rs.getDouble("discountValue"));
+                voucher.setMinOrderValue(rs.getDouble("minOrderValue"));
+                voucher.setMaxDiscountValue(rs.getDouble("maxDiscountValue"));
+                voucher.setStatus(rs.getString("status"));
+                voucher.setStartDate(rs.getDate("startDate"));
+                voucher.setEndDate(rs.getDate("endDate"));
+                voucher.setUsageLimit(rs.getInt("usageLimit"));
+                vouchers.add(voucher);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vouchers;
+    }
+
+    // chỉnh sửa voucher
+    public Boolean updateVoucher(Voucher voucher, int id) {
+        String query = """
+                update vouchers set
+                description = COALESCE(?, description),
+                discountType = COALESCE(?, discountType),
+                discountValue = COALESCE(?, discountValue),
+                minOrderValue = COALESCE(?, minOrderValue),
+                maxDiscountValue = COALESCE(?, maxDiscountValue),
+                startDate = COALESCE(?, startDate),
+                endDate = COALESCE(?, endDate),
+                status = COALESCE(?, status),
+                usageLimit = COALESCE(?, usageLimit)
+                where id = ?
+                """;
+        Voucher currentVoucher = detailVoucher(id, "active");
+        if (currentVoucher == null) {
+            return false;
+        }
+        try (Connection conn = DBconnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1,
+                    (voucher.getDescription() != null && !voucher.getDescription().isEmpty()) ? voucher.getDescription()
+                            : currentVoucher.getDescription());
+
+            pstmt.setString(2,
+                    (voucher.getDiscountType() != null && !voucher.getDiscountType().isEmpty())
+                            ? voucher.getDiscountType()
+                            : currentVoucher.getDiscountType());
+            pstmt.setDouble(3, (voucher.getDiscountValue() != 0) ? voucher.getDiscountValue()
+                    : currentVoucher.getDiscountValue());
+            pstmt.setDouble(4, (voucher.getMinOrderValue() != 0) ? voucher.getMinOrderValue()
+                    : currentVoucher.getMinOrderValue());
+            pstmt.setDouble(5, (voucher.getMaxDiscountValue() != 0) ? voucher.getMaxDiscountValue()
+                    : currentVoucher.getMaxDiscountValue());
+            pstmt.setDate(6, (voucher.getStartDate() != null) ? voucher.getStartDate()
+                    : currentVoucher.getStartDate());
+            pstmt.setDate(7, (voucher.getEndDate() != null) ? voucher.getEndDate()
+                    : currentVoucher.getEndDate());
+            pstmt.setString(8, (voucher.getStatus() != null) ? voucher.getStatus()
+                    : currentVoucher.getStatus());
+            pstmt.setInt(9, (voucher.getUsageLimit() != 0) ? voucher.getUsageLimit()
+                    : currentVoucher.getUsageLimit());
+            pstmt.setInt(10, id);
+            int rs = pstmt.executeUpdate();
+            return rs > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Boolean deleteVoucher(int id) {
+        String query = "UPDATE vouchers SET isDeleted = 1, updatedAt = CURRENT_TIMESTAMP WHERE id = ? AND isDeleted = 0";
+
+        try (Connection conn = DBconnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, id);
+            int rowsAffected = pstmt.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }
+// hết chỉnh sửa voucher

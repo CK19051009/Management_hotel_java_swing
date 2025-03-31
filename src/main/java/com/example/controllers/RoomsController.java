@@ -44,7 +44,7 @@ public class RoomsController {
 
     // Tạo phòng
     public Boolean createRoom(Room room) {
-        String query = "INSERT INTO rooms (roomNumber, type, status, price, description, capacity, position, thumbnail) VALUES (?, ?, ?, ?, ?, ?, ?,?)";
+        String query = "INSERT INTO rooms (roomNumber, type, status, price, description, capacity) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setInt(1, room.getRoomNumber());
@@ -53,8 +53,6 @@ public class RoomsController {
             pstmt.setDouble(4, room.getPrice());
             pstmt.setString(5, room.getDescription());
             pstmt.setInt(6, room.getCapacity());
-            pstmt.setInt(7, room.getPosition());
-            pstmt.setString(8, room.getThumbnail());
             int rs = pstmt.executeUpdate();
             return rs > 0;
         } catch (SQLException e) {
@@ -142,14 +140,14 @@ public class RoomsController {
                 return false;
             }
             // note chỗ đổi kiểu roomNumber
-//            pstmt.setObject(1, (room.getRoomNumber() != null) ? room.getRoomNumber()
-//                    : currentRoom.getRoomNumber(), java.sql.Types.INTEGER);
+            pstmt.setInt(1, room.getRoomNumber() != 0 ? room.getRoomNumber()
+                    : currentRoom.getRoomNumber());
             pstmt.setString(2, (room.getRoomType() != null && !room.getRoomType().isEmpty()) ? room.getRoomType()
                     : currentRoom.getRoomType());
             pstmt.setString(3, (room.getStatus() != null && !room.getStatus().isEmpty()) ? room.getStatus()
                     : currentRoom.getStatus());
-//            pstmt.setObject(4, (room.getPrice() != null) ? room.getPrice() : currentRoom.getPrice(),
-//                    java.sql.Types.DOUBLE);
+            pstmt.setObject(4, (room.getPrice() != 0) ? room.getPrice() : currentRoom.getPrice(),
+                    java.sql.Types.DOUBLE);
             pstmt.setString(5,
                     (room.getDescription() != null && !room.getDescription().isEmpty()) ? room.getDescription()
                             : currentRoom.getDescription());
@@ -186,8 +184,8 @@ public class RoomsController {
 
         return false;
     }
-    // hết xóa phòng
 
+    // hết xóa phòng
     // tìm phòng đang được sử dụng
     public Room foundRoomUse(int roomNumber) {
         String query = """
@@ -220,7 +218,7 @@ public class RoomsController {
 
     // cập nhập lại trạng thái phòng
     public Boolean updateRoomStatus(int roomId, String status) {
-        String query = "UPDATE rooms SET status = ? WHERE id = ?";
+        String query = "UPDATE rooms SET status = ? WHERE id = ? and isDeleted = 0";
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, status);
@@ -237,7 +235,7 @@ public class RoomsController {
     // Lấy ra danh sách phòng dựa trên trạng thái
     public List<Room> listStatus(String status) {
         String query = """
-                Select * from rooms where status = ?
+                Select * from rooms where status = ? and isDeleted = 0
                 """;
         List<Room> rooms = new ArrayList<>();
         try (Connection conn = DBconnection.getConnection();) {

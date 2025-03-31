@@ -87,9 +87,9 @@ public class Index extends JPanel {
         btnAdd.setBackground(new Color(30, 60, 90));
         buttonCustom.customizeButton(btnAdd);
         // Chuyển sang giao diện "Thêm phòng"
-        btnAdd.addActionListener(e -> {
-            mainDefault.showContent(new AddRoomPanel(mainDefault));
-        });
+        // btnAdd.addActionListener(e -> {
+        // mainDefault.showContent(new AddRoomPanel(mainDefault));
+        // });
         // Thêm các thành phần vào topPanel
         topPanel.add(cbStatus);
         topPanel.add(btnApplySatus);

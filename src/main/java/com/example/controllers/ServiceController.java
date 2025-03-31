@@ -32,7 +32,7 @@ public class ServiceController {
     // Lấy tất cả dịch vụ
     public List<Service> getAllService() {
         List<Service> services = new ArrayList<Service>();
-        String query = "SELECT * FROM services";
+        String query = "SELECT * FROM services where isDeleted = 0";
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query);
                 ResultSet rs = pstmt.executeQuery()) {
@@ -112,23 +112,21 @@ public class ServiceController {
     }
 
     // Xóa dịch vụ, thêm biến isDeleted để ẩn đi dịch vụ hay dùng status để ẩn
-    /*
-     * public Boolean deleteService(int id) {
-     * String query =
-     * "UPDATE services SET isDeleted = 1 WHERE id = ? AND isDeleted = 0";
-     * 
-     * try (Connection conn = DBconnection.getConnection();
-     * PreparedStatement pstmt = conn.prepareStatement(query)) {
-     * 
-     * pstmt.setInt(1,id);
-     * int rowsAffected = pstmt.executeUpdate();
-     * 
-     * return rowsAffected > 0;
-     * } catch (SQLException e) {
-     * e.printStackTrace();
-     * }
-     * return false;
-     * }
-     */
+
+    public Boolean deleteService(int id) {
+        String query = "UPDATE services SET isDeleted = 1 WHERE id = ? AND isDeleted = 0";
+
+        try (Connection conn = DBconnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, id);
+            int rowsAffected = pstmt.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
 }

@@ -14,6 +14,15 @@ public class Employee {
 
     }
 
+    public Employee(String userName, String fullName, String email, String password, String levelUser, String status) {
+        this.userName = userName;
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.levelUser = levelUser;
+        this.status = status;
+    }
+
     public Employee(String email, String password) {
         this.email = email;
         this.password = password;

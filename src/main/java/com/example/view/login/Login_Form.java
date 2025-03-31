@@ -4,6 +4,7 @@ import com.example.controllers.EmployeeController;
 import com.example.models.Employee;
 // import com.example.view.room.Calculator_frame;
 import com.example.view.default_main.MainDefault;
+import com.example.view.room.mainDefault;
 
 /**
  *
@@ -330,7 +331,7 @@ public class Login_Form extends javax.swing.JFrame {
                 if (employee) {
                         System.out.println("Đăng nhập thành công");
 
-                        MainDefault mainDefault = new MainDefault();
+                        mainDefault mainDefault = new mainDefault();
                         mainDefault.setVisible(true);
                         dispose();
 

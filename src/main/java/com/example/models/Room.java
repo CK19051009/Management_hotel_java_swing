@@ -97,6 +97,15 @@ public class Room {
         this.services = services;
     }
 
+    public Room(int roomNumber, String roomType, String status, double price, String description, Integer capacity) {
+        this.roomNumber = roomNumber;
+        this.roomType = roomType;
+        this.status = status;
+        this.price = price;
+        this.description = description;
+        this.capacity = capacity;
+    }
+
     public Room(int roomNumber, String roomType, String status, double price, String description,
             int capacity, int position, String thumbnail) {
         this.roomNumber = roomNumber;
