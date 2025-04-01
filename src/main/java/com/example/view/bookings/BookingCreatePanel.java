@@ -9,7 +9,7 @@ import com.example.models.Guest;
 import com.example.models.Room;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
+
 import java.awt.event.ActionListener;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -38,6 +38,7 @@ public class BookingCreatePanel {
         JTextField textRoomStatus = new JTextField(15);
         JTextField textRoomPrice = new JTextField(15);
         JTextField inputDeposit = new JTextField(10);
+        JButton buttonCreateCustomer;
         private DefaultTableModel tableModel;
         JTable tableSearchResults;
         JTable tableCustomerResults;
@@ -107,7 +108,7 @@ public class BookingCreatePanel {
                 inputCheckInBooking.setText(String.valueOf((timestamp)));
                 leftPanel.add(inputCheckInBooking);
 
-                JButton buttonCreateCustomer = new JButton("Tạo khách hàng");
+                buttonCreateCustomer = new JButton("Tạo khách hàng");
                 leftPanel.add(new JLabel()); // Ô trống để căn chỉnh
                 leftPanel.add(buttonCreateCustomer);
 
@@ -400,5 +401,9 @@ public class BookingCreatePanel {
 
         public void actionCancel(ActionListener e) {
                 buttonCancelBooking.addActionListener(e);
+        }
+
+        public void actionCreateCustomer(ActionListener e) {
+                buttonCreateCustomer.addActionListener(e);
         }
 }

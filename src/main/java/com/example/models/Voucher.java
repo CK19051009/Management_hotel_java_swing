@@ -15,6 +15,14 @@ public class Voucher {
     private Date endDate;
     private int usageLimit;
     private int usedCount = 0;
+
+    public Voucher(int id, String discountType, double discountValue, int usageLimit) {
+        this.id = id;
+        this.discountType = discountType;
+        this.discountValue = discountValue;
+        this.usageLimit = usageLimit;
+    }
+
     private String status = "active";
 
     public Voucher() {

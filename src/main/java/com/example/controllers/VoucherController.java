@@ -77,9 +77,38 @@ public class VoucherController {
 
     public List<Voucher> listVouchers() {
         List<Voucher> vouchers = new ArrayList<Voucher>();
-        String query = "SELECT * FROM vouchers where isDeleted = 0";
+        String query = "SELECT * FROM vouchers where isDeleted = 0 ";
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Voucher voucher = new Voucher();
+                voucher.setId(rs.getInt("id"));
+                voucher.setCode(rs.getString("code"));
+                voucher.setDescription(rs.getString("description"));
+                voucher.setDiscountType(rs.getString("discountType"));
+                voucher.setDiscountValue(rs.getDouble("discountValue"));
+                voucher.setMinOrderValue(rs.getDouble("minOrderValue"));
+                voucher.setMaxDiscountValue(rs.getDouble("maxDiscountValue"));
+                voucher.setStatus(rs.getString("status"));
+                voucher.setStartDate(rs.getDate("startDate"));
+                voucher.setEndDate(rs.getDate("endDate"));
+                voucher.setUsageLimit(rs.getInt("usageLimit"));
+                vouchers.add(voucher);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vouchers;
+    }
+
+    public List<Voucher> listVouchersStatus(String status) {
+        List<Voucher> vouchers = new ArrayList<Voucher>();
+        String query = "SELECT * FROM vouchers where isDeleted = 0 and status = ?";
+        try (Connection conn = DBconnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, status);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 Voucher voucher = new Voucher();

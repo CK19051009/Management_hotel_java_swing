@@ -189,7 +189,7 @@ public class RoomsController {
     // tìm phòng đang được sử dụng
     public Room foundRoomUse(int roomNumber) {
         String query = """
-                Select * from rooms where status = 'occupied' and roomNumber = ? and isDeleted = 0
+                Select * from rooms where status = 'occupied' and id = ? and isDeleted = 0
                 """;
         Room room = null;
         try (Connection conn = DBconnection.getConnection();

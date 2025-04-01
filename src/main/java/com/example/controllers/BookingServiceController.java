@@ -60,7 +60,7 @@ public class BookingServiceController {
     // cập nhập số lần sử dụng dịch vụ
     public Boolean updateQuantity(int quantityNew, int serviceId, int bookingId) {
         String query = """
-                UPDATE BOOKING_SERVICES SET quantity = ? where bookingId  = ? and serviceId = ? ;
+                UPDATE booking_services SET quantity = ? where bookingId  = ? and serviceId = ? ;
                 """;
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -102,5 +102,20 @@ public class BookingServiceController {
         }
         return list;
     }
+
     // hết lấy ra danh sách dịch vụ khách hàng sử dụng trong quá trình đặt phòng
+    // xóa dịch vụ khỏi hóa đơn
+    public Boolean deleteServiceOfBooking(int id, int bookingId) {
+        String query = "DELETE FROM booking_services WHERE id = ? and bookingId = ? ";
+        try (Connection conn = DBconnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, id);
+            pstmt.setInt(2, bookingId);
+            int result = pstmt.executeUpdate();
+            return result > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

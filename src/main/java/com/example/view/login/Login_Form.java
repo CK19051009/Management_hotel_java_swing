@@ -15,6 +15,17 @@ public class Login_Form extends javax.swing.JFrame {
         /**
          * Creates new form Login_Form
          */
+
+        private Employee employee;
+
+        public Employee getEmployee() {
+                return employee;
+        }
+
+        public void setEmployee(Employee employee) {
+                this.employee = employee;
+        }
+
         public Login_Form() {
                 initComponents();
         }
@@ -327,10 +338,10 @@ public class Login_Form extends javax.swing.JFrame {
                 char[] passArray = pass.getPassword();
                 String passString = new String(passArray);
                 EmployeeController employeeController = new EmployeeController();
-                Boolean employee = employeeController.login(user, passString);
-                if (employee) {
+                Employee employee = employeeController.login(user, passString);
+                if (employee != null) {
                         System.out.println("Đăng nhập thành công");
-
+                        setEmployee(employee);
                         mainDefault mainDefault = new mainDefault();
                         mainDefault.setVisible(true);
                         dispose();

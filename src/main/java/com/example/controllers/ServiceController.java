@@ -32,7 +32,7 @@ public class ServiceController {
     // Lấy tất cả dịch vụ
     public List<Service> getAllService() {
         List<Service> services = new ArrayList<Service>();
-        String query = "SELECT * FROM services where isDeleted = 0";
+        String query = "SELECT * FROM services where isDeleted = 0 and status ='available'";
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query);
                 ResultSet rs = pstmt.executeQuery()) {
@@ -94,6 +94,7 @@ public class ServiceController {
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setInt(1, id);
+            // pstmt.setString(2, status);
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {

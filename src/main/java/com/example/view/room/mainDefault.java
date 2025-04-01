@@ -11,21 +11,31 @@ import java.time.LocalDateTime;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.table.DefaultTableModel;
 
+import java.util.*;
 import org.mindrot.jbcrypt.BCrypt;
 
 import com.example.controllers.BookingController;
+import com.example.controllers.BookingServiceController;
+import com.example.controllers.BookingVoucherController;
 import com.example.controllers.EmployeeController;
+import com.example.controllers.GuestController;
+import com.example.controllers.PaymentController;
 import com.example.controllers.RoomsController;
 import com.example.controllers.ServiceController;
 import com.example.controllers.VoucherController;
 import com.example.models.Booking;
+import com.example.models.BookingService;
+import com.example.models.BookingVoucher;
 import com.example.models.Employee;
+import com.example.models.Guest;
 import com.example.models.Room;
 import com.example.models.Service;
 import com.example.models.Voucher;
 import com.example.view.bookings.BookingEditPanel;
 import com.example.view.bookings.BookingMain;
+import com.example.view.bookings.BookingCheckOut;
 import com.example.view.bookings.BookingCreatePanel;
 import com.example.view.dashboard.HomePanel;
 import com.example.view.default_main.menuPanel;
@@ -33,6 +43,7 @@ import com.example.view.employee.CreateEmployeePanel;
 import com.example.view.employee.EditEmployeePanel;
 import com.example.view.employee.EmployeeManagement;
 import com.example.view.employee.TimeKeeping;
+import com.example.view.revenue.RevenuePanel;
 import com.example.view.service.AddService;
 import com.example.view.service.EditService;
 import com.example.view.service.ServicePanel;
@@ -80,20 +91,24 @@ public class mainDefault extends javax.swing.JFrame {
         BookingMain bookingMain = new BookingMain();
         BookingCreatePanel BookingsPanel = new BookingCreatePanel();
         BookingEditPanel bookingUpdatePanel = new BookingEditPanel();
+        BookingCheckOut bookingCheckOut = new BookingCheckOut();
+        RevenuePanel reportRevenuePanel = new RevenuePanel();
         // controller
         RoomsController roomsController = new RoomsController();
         ServiceController serviceController = new ServiceController();
         EmployeeController employeeController = new EmployeeController();
         VoucherController voucherController = new VoucherController();
         BookingController bookingController = new BookingController();
+        GuestController guestController = new GuestController();
+        BookingServiceController bookingServiceController = new BookingServiceController();
+        BookingVoucherController bookingVoucherController = new BookingVoucherController();
+        PaymentController paymentController = new PaymentController();
 
         public mainDefault() {
                 initComponents();
         }
 
         // cardLayout = (CardLayout) contentPanel.getLayout();
-
-        @SuppressWarnings("checked")
 
         private void initComponents() {
 
@@ -225,7 +240,7 @@ public class mainDefault extends javax.swing.JFrame {
 
                 contentPanel.setBackground(new java.awt.Color(255, 255, 255));
                 contentPanel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-                contentPanel.setPreferredSize(new java.awt.Dimension(1100, 700));
+                contentPanel.setPreferredSize(new java.awt.Dimension(1100, 800));
                 contentPanel.setLayout(new java.awt.CardLayout(20, 30));
 
                 homePanel = dashBoardPanel.dashboardPanel();
@@ -267,6 +282,8 @@ public class mainDefault extends javax.swing.JFrame {
                 contentPanel.add(bookingPanel, "bookingPanel");
                 bookingEditPanel = bookingUpdatePanel.renderPanel();
                 contentPanel.add(bookingEditPanel, "bookingEditPanel");
+                contentPanel.add(bookingCheckOut.renderPanel(), "invoicePanel");
+                contentPanel.add(reportRevenuePanel.renderPanel(), "revenuePanel");
                 // hết hóa đơn
                 editRoomPanel.setLayout(new java.awt.BorderLayout());
 
@@ -505,7 +522,7 @@ public class mainDefault extends javax.swing.JFrame {
                 getContentPane().add(contentPanel, java.awt.BorderLayout.CENTER);
                 cardLayout = (CardLayout) contentPanel.getLayout();
 
-                cardLayout.show(contentPanel, "homePanel");
+                cardLayout.show(contentPanel, "bookingMainPanel");
                 pack();
                 setLocationRelativeTo(null);
 
@@ -585,15 +602,23 @@ public class mainDefault extends javax.swing.JFrame {
                         String time = String.valueOf(now);
 
                         BookingsPanel.setCheckIn(time);
+
                         cardLayout.show(contentPanel, "bookingPanel");
                 });
                 BookingsPanel.actionSaveBill(e -> {
                         int idCustomer = BookingsPanel.getIdGuest();
                         int idRoom = BookingsPanel.getIdRoomPlaced();
                         String checkInString = BookingsPanel.getCheckIn();
-                        // LocalDateTime now = LocalDateTime.now();
+                        checkInString = checkInString.replace("T", " ");
                         Timestamp timestamp = Timestamp.valueOf(checkInString);
-                        Double depositAmount = Double.parseDouble(BookingsPanel.getDeposit());
+                        Double depositAmount;
+                        System.out.println(BookingsPanel.getDeposit());
+                        if (BookingsPanel.getDeposit() == null || BookingsPanel.getDeposit().isEmpty()) {
+                                depositAmount = 0.0;
+                        } else {
+
+                                depositAmount = Double.parseDouble(BookingsPanel.getDeposit());
+                        }
                         Booking booking = new Booking(idRoom, idCustomer, timestamp,
                                         depositAmount);
                         Boolean createBooking = bookingController.createBookings(booking);
@@ -602,6 +627,8 @@ public class mainDefault extends javax.swing.JFrame {
                                                 .updateRoomStatus(idRoom, "occupied");
                                 BookingsPanel.clearData();
                                 ;
+                                BookingsPanel.refreshTable();
+                                bookingMain.refreshTable();
                                 cardLayout.show(contentPanel, "bookingMainPanel");
                                 JOptionPane.showMessageDialog(null, "Tạo hóa đơn thành công!");
                         } else {
@@ -610,11 +637,404 @@ public class mainDefault extends javax.swing.JFrame {
                         }
 
                 });
+                // sang sự kiện cập nhập hóa đơn
+                bookingMain.actionUpdateBill(e -> {
+                        Booking bookingSeleted = bookingMain.getSelectedBooking();
+                        if (bookingSeleted == null) {
+                                JOptionPane.showMessageDialog(null, "Vui lòng chọn 1 hóa đơn!");
+                                return;
+                        } else {
+                                Guest guest = guestController.getGuestById(bookingSeleted.getGuestId());
+                                Room room = roomsController.roomDetail(bookingSeleted.getRoomId());
+                                bookingUpdatePanel.setData(bookingSeleted, guest, room);
+                                bookingUpdatePanel.setBookingId(bookingSeleted.getId());
+                                int idBooking = bookingUpdatePanel.getBookingId();
+                                List<BookingService> bookings = bookingServiceController
+                                                .listServiceUseOfBooking(idBooking);
+
+                                Double totalPrice = 0.0;
+                                for (BookingService item : bookings) {
+                                        totalPrice += item.getTotalPrice();
+                                }
+
+                                bookingUpdatePanel.setTotalPrice(totalPrice);
+                                bookingUpdatePanel.refreshTableServiceUsage();
+                                cardLayout.show(contentPanel, "bookingEditPanel");
+                        }
+                });
                 // hủy
                 BookingsPanel.actionCancel(e -> {
                         BookingsPanel.clearData();
                         cardLayout.show(contentPanel, "bookingMainPanel");
                 });
+                bookingUpdatePanel.actionBack(e -> {
+                        cardLayout.show(contentPanel, "bookingMainPanel");
+                        bookingUpdatePanel.clearData();
+                        bookingUpdatePanel.clearTableSelection();
+                });
+                // Xóa dịch vụ
+                bookingUpdatePanel.deleteService(e -> {
+                        int idDelete = bookingUpdatePanel.getSeletedDelete();
+                        System.out.println("iD dịch vụ phòng muốn xóa: " + idDelete);
+                        if (idDelete == -1) {
+                                JOptionPane.showMessageDialog(null, "Vui lòng chọn một dịch vụ để xóa!", "Thông báo",
+                                                JOptionPane.WARNING_MESSAGE);
+                                return;
+
+                        } else {
+                                Booking bookingSeleted = bookingMain.getSelectedBooking();
+                                bookingUpdatePanel.setBookingId(bookingSeleted.getId());
+
+                                Boolean isDelete = bookingServiceController.deleteServiceOfBooking(idDelete,
+                                                bookingSeleted.getId());
+                                if (isDelete) {
+                                        JOptionPane.showMessageDialog(null, "Xóa dịch vụ thành công!", "Thông báo",
+                                                        JOptionPane.WARNING_MESSAGE);
+
+                                        List<BookingService> bookings = bookingServiceController
+                                                        .listServiceUseOfBooking(bookingSeleted.getId());
+
+                                        Double totalPrice = 0.0;
+                                        for (BookingService item : bookings) {
+                                                totalPrice += item.getTotalPrice();
+                                        }
+
+                                        bookingUpdatePanel.setTotalPrice(totalPrice);
+                                        bookingUpdatePanel.refreshTableServiceUsage();
+                                } else {
+                                        JOptionPane.showMessageDialog(null, "Xóa dịch vụ lỗi!", "Thông báo",
+                                                        JOptionPane.WARNING_MESSAGE);
+                                }
+                        }
+                });
+                // thêm dịch vụ trong quá trình sử dụng phòng
+                bookingUpdatePanel.actionAddService(e -> {
+                        Booking bookingSeleted = bookingMain.getSelectedBooking();
+                        if (bookingSeleted == null) {
+                                JOptionPane.showMessageDialog(null, "Không tìm thấy hóa đơn được chọn!");
+                                return;
+                        }
+
+                        BookingService serviceUsage = bookingUpdatePanel.getServiceSelected();
+                        if (serviceUsage == null) {
+                                JOptionPane.showMessageDialog(null, "Vui lòng chọn một dịch vụ!");
+                                return;
+                        }
+
+                        BookingService isCheckedService = bookingServiceController.checkSerivced(
+                                        serviceUsage.getServiceId(),
+                                        bookingSeleted.getId());
+
+                        if (isCheckedService == null) {
+                                System.out.println("Dịch vụ chưa tồn tại trong hóa đơn, thêm mới.");
+                                Boolean isCreated = bookingServiceController.useService(serviceUsage);
+                                if (isCreated) {
+                                        bookingUpdatePanel.setBookingId(bookingSeleted.getId());
+                                        bookingUpdatePanel.refreshTable();
+                                        bookingUpdatePanel.refreshTableServiceUsage();
+
+                                        int idBooking = bookingUpdatePanel.getBookingId();
+                                        List<BookingService> bookings = bookingServiceController
+                                                        .listServiceUseOfBooking(idBooking);
+                                        if (bookings == null || bookings.isEmpty()) {
+                                                System.out.println("Không có dịch vụ nào trong hóa đơn.");
+                                                return;
+                                        }
+
+                                        Double totalPrice = 0.0;
+                                        for (BookingService item : bookings) {
+                                                totalPrice += item.getTotalPrice();
+                                        }
+                                        System.out.println("Tổng tiền: " + totalPrice);
+                                        bookingUpdatePanel.setTotalPrice(totalPrice);
+
+                                        JOptionPane.showMessageDialog(null, "Thêm dịch vụ thành công!");
+                                        bookingUpdatePanel.clearData();
+                                } else {
+                                        JOptionPane.showMessageDialog(null, "Thêm dịch vụ thất bại!");
+                                }
+                        } else {
+                                System.out.println("Dịch vụ đã tồn tại, cập nhật số lượng.");
+                                int serviceCurrent = isCheckedService.getQuantity();
+                                int quantityNew = serviceCurrent + bookingUpdatePanel.getUsageService();
+                                System.out.println("Số lượng mới: " + quantityNew);
+
+                                Boolean updateQuantity = bookingServiceController.updateQuantity(
+                                                quantityNew,
+                                                serviceUsage.getServiceId(),
+                                                bookingSeleted.getId());
+
+                                if (updateQuantity) {
+                                        JOptionPane.showMessageDialog(null, "Cập nhật số lượng thành công!");
+                                        int idBooking = bookingUpdatePanel.getBookingId();
+                                        List<BookingService> bookings = bookingServiceController
+                                                        .listServiceUseOfBooking(idBooking);
+                                        if (bookings == null || bookings.isEmpty()) {
+                                                System.out.println("Không có dịch vụ nào trong hóa đơn.");
+                                                return;
+                                        }
+
+                                        Double totalPrice = 0.0;
+                                        for (BookingService item : bookings) {
+                                                totalPrice += item.getTotalPrice();
+                                        }
+                                        // System.out.println("Tổng tiền: " + totalPrice);
+                                        bookingUpdatePanel.setTotalPrice(totalPrice);
+                                        bookingUpdatePanel.refreshTableServiceUsage();
+                                        bookingUpdatePanel.clearData();
+                                } else {
+                                        JOptionPane.showMessageDialog(null, "Cập nhật số lượng thất bại!");
+                                }
+                        }
+                });
+
+                bookingUpdatePanel.updateBill(e -> {
+                        cardLayout.show(contentPanel, "bookingMainPanel");
+                });
+                // sự kiện check-out
+                bookingMain.actionCheckOut(e -> {
+                        DefaultTableModel tableModelVoucherApp = bookingCheckOut.getTableModelVoucherApp();
+                        tableModelVoucherApp.setRowCount(0);
+
+                        Booking bookingSeleted = bookingMain.getSelectedBooking();
+                        bookingCheckOut.setIdBooking(bookingSeleted.getId());
+                        bookingCheckOut.setIdCustomer(bookingSeleted.getGuestId());
+                        bookingCheckOut.setIdRoom(bookingSeleted.getRoomId());
+                        int idBooking = bookingCheckOut.getIdBooking();
+                        int idCustomer = bookingCheckOut.getIdCustomer();
+                        int idRoom = bookingCheckOut.getIdRoom();
+                        // System.out.println(idRoom);
+                        // truy vấn lây thông tin trả ra giao diện
+                        Guest guest = guestController.getGuestById(idCustomer);
+                        System.out.println(guest);
+                        Room room = roomsController.foundRoomUse(idRoom);
+
+                        // System.out.println(room);
+                        bookingCheckOut.setInforCustomer(guest);
+                        // tính toán tổng số tiền phải trả
+                        double totalPriceService = 0; // tổng tiền sử dụng dịch vụ phải trả
+                        List<BookingService> bookingServices = bookingServiceController
+                                        .listServiceUseOfBooking(bookingSeleted.getId());
+                        if (bookingServices.size() > 0) {
+                                for (BookingService item : bookingServices) {
+                                        totalPriceService += item.getTotalPrice();
+                                }
+                        }
+                        LocalDateTime now = LocalDateTime.now().withNano(0);
+                        ;
+                        Timestamp timeCheckOut = Timestamp.valueOf(now);
+
+                        Timestamp checkIn = bookingSeleted.getCheckIn();
+                        long milliseconds = timeCheckOut.getTime() - checkIn.getTime();
+                        double days = Math.ceil(milliseconds / (1000.0 * 60 * 60 * 24));
+                        double totalRoomPrice = room.getPrice() * days;
+                        double totalAmount = totalRoomPrice + totalPriceService;
+                        // // Hiển thị thông tin thanh toán
+                        Double totalPriceDicount = 0.0;
+                        bookingCheckOut.setTotalDicount(totalPriceDicount);
+                        System.out.println("Thông tin thanh toán:");
+                        System.out.println("Số ngày thuê: " + (int) days);
+                        System.out.println("Tiền thuê phòng: " + totalRoomPrice);
+                        System.out.println("Tiền dịch vụ: " + totalPriceService);
+                        System.out.println("Tổng tiền phải trả: " + totalAmount);
+                        bookingCheckOut.setCheckOut(String.valueOf(timeCheckOut));
+                        bookingCheckOut.setTimeStay(String.valueOf(days));
+                        bookingCheckOut.setTotalRoomPrice(totalRoomPrice);
+                        bookingCheckOut.setTotalPriceService(totalPriceService);
+                        bookingCheckOut.setTotalAmount(totalAmount);
+                        bookingCheckOut.setBookingUsage(bookingSeleted);
+                        bookingCheckOut.setRoomUsage(room);
+                        bookingCheckOut.setPricePay(totalRoomPrice, totalPriceService, totalPriceDicount, totalAmount);
+                        DefaultTableModel tableModelRoom = bookingCheckOut.getTableModelRoom();
+                        tableModelRoom.setRowCount(0);
+                        bookingCheckOut.addRoom(room, bookingSeleted, tableModelRoom);
+                        // trả ra dịch vụ khách hàng sử dụng
+                        List<BookingService> serviceUsageOfGuest = bookingServiceController
+                                        .listServiceUseOfBooking(idBooking);
+                        DefaultTableModel tableModelServiceUsage = bookingCheckOut.getTableModelServiceUsage();
+                        tableModelServiceUsage.setRowCount(0);
+                        for (BookingService item : serviceUsageOfGuest) {
+                                Service serviceOfBill = serviceController.getServiceById(item.getServiceId());
+                                bookingCheckOut.addRoom(serviceOfBill, item, tableModelServiceUsage);
+                        }
+                        // trả ra danh sách voucher có sẵn
+                        DefaultTableModel tableModelVoucherAvailable = bookingCheckOut.getTableModelVoucherAvailable();
+                        tableModelVoucherAvailable.setRowCount(0);
+                        List<Voucher> vouchers = voucherController.listVouchersStatus("active");
+                        for (Voucher voucher : vouchers) {
+                                bookingCheckOut.addRoom(voucher, tableModelVoucherAvailable);
+                        }
+                        cardLayout.show(contentPanel, "invoicePanel");
+                });
+                // thêm voucher cho hóa đơn
+                bookingCheckOut.actionAddVoucher(e -> {
+                        int bookingId = bookingCheckOut.getIdBooking();
+                        Voucher voucherSelected = bookingCheckOut.getVoucherSelected();
+                        if (voucherSelected == null) {
+                                JOptionPane.showMessageDialog(null, "Vui lòng chọn một dịch vụ để thêm!", "Thông báo",
+                                                JOptionPane.WARNING_MESSAGE);
+                                return;
+                        }
+                        Voucher voucherApp = voucherController.detailVoucher(voucherSelected.getId(), "active");
+                        System.out.println(voucherApp);
+                        double minOrderValue = voucherApp.getMinOrderValue();
+                        double maxDiscountValue = voucherApp.getMaxDiscountValue();
+                        System.out.println(bookingId);
+                        double totalAmount = bookingCheckOut.getTotalAmount();
+                        double totalPriceRoom = bookingCheckOut.getTotalRoomPrice();
+                        double totalPriceService = bookingCheckOut.getTotalPriceService();
+                        double amount = totalAmount; // ti xet
+                        System.out.println("Tien phong = " + totalPriceRoom);
+                        System.out.println("Tien dv " + totalPriceService);
+                        System.out.println("Tong tien chua tru giam gia " + totalAmount);
+                        System.out.println(totalAmount);
+                        double discountValue = 0;
+                        String dicountType = voucherApp.getDiscountType();
+                        Boolean useVocher = true;
+                        if (dicountType.equals("FIXED") && totalAmount >= minOrderValue) {
+                                discountValue = voucherApp.getDiscountValue();
+
+                                amount = totalAmount - discountValue;
+                                // useVocher = bookingVoucherController.createBookingVoucher(
+                                // bookingId, voucherApp.getId(), discountValue);
+                                System.out.println("trong 1 " + useVocher);
+
+                        }
+                        if (dicountType.equals("PERCENTAGE") && totalAmount >= minOrderValue) {
+                                if (((discountValue / 100) * totalAmount) > maxDiscountValue) {
+                                        discountValue = maxDiscountValue;
+                                        amount = totalAmount - maxDiscountValue;
+                                        // useVocher = bookingVoucherController.createBookingVoucher(
+                                        // bookingId, voucherApp.getId(), discountValue);
+                                        System.out.println("trong 2 " + useVocher);
+
+                                } else {
+                                        discountValue = ((voucherApp.getDiscountValue() / 100) * totalAmount);
+                                        amount = totalAmount - discountValue;
+                                        // useVocher = bookingVoucherController.createBookingVoucher(
+                                        // bookingId, voucherApp.getId(), discountValue);
+                                        System.out.println("trong 3 " + useVocher);
+
+                                }
+                        }
+                        bookingCheckOut.setTotalDicount(discountValue);
+                        System.out.println(discountValue);
+                        System.out.println(amount);
+                        System.out.println(useVocher);
+                        if (!useVocher) {
+                                JOptionPane.showMessageDialog(null, "Thêm mã giảm giá thất bại!", "Thông báo",
+                                                JOptionPane.WARNING_MESSAGE);
+                                System.out.println("Gia sau khi khong them ma giam " + amount);
+                                bookingCheckOut.setPricePay(totalPriceRoom, totalPriceService, discountValue, amount);
+                        } else {
+
+                                // thêm sau trả ra giao diện sử dụng dịch vụ
+                                DefaultTableModel tableModelVoucherApp = bookingCheckOut.getTableModelVoucherApp();
+                                tableModelVoucherApp.setRowCount(0);
+                                bookingCheckOut.addRoom(bookingId, voucherApp.getId(), discountValue,
+                                                tableModelVoucherApp);
+                                amount = totalAmount - discountValue;
+                                bookingCheckOut.setTotalAmount(amount);
+                                bookingCheckOut.setTotalDicount(discountValue);
+
+                                System.out.println("Gia khi ap ma giam gia " + amount);
+                                bookingCheckOut.setPricePay(totalPriceRoom, totalPriceService, discountValue, amount);
+                        }
+                        // bookingCheckOut.clearSelectedTable();
+
+                });
+
+                // sử kiện tạo hóa đơn khi nhấn trả phòng
+                bookingCheckOut.actionSuccessBill(e -> {
+                        Voucher voucherSelected = bookingCheckOut.getVoucherSelected();
+                        int bookingId = bookingCheckOut.getIdBooking();
+                        int idRoom = bookingCheckOut.getIdRoom();
+                        System.out.println(bookingCheckOut.getTimeStay());
+                        Timestamp timeCheckout = Timestamp.valueOf(bookingCheckOut.getCheckOut());
+                        if (voucherSelected != null) {
+
+                                Double amount = bookingCheckOut.getTotalAmount();
+
+                                Double discountPrice = bookingCheckOut.getTotalDicount();
+                                System.out.println("Tong tien giam gia" + discountPrice);
+                                System.out.println("Tong tien cuoi cung" + amount);
+
+                                Voucher voucherApp = voucherController.detailVoucher(voucherSelected.getId(), "active");
+                                // lưu dịch vụ voucher
+                                Double discountValue = bookingCheckOut.getTotalDicount();
+                                Boolean useVocher = bookingVoucherController.createBookingVoucher(
+                                                bookingId, voucherApp.getId(), discountValue);
+                                if (!useVocher) {
+                                        JOptionPane.showMessageDialog(null, "Thêm mã giảm giá thất bại!", "Thông báo",
+                                                        JOptionPane.WARNING_MESSAGE);
+
+                                } else {
+                                        Boolean checkedPayment = paymentController.createPayment(bookingId,
+                                                        amount, "Cash");
+                                        if (!checkedPayment) {
+                                                System.out.println("Tạo hóa đơn thất bại!");
+                                                Boolean changeStatus = paymentController.changeStatus(
+                                                                bookingId,
+                                                                "Failed");
+                                                return;
+                                        }
+                                        Boolean updateStatusRoom = roomsController
+                                                        .updateRoomStatus(idRoom, "available");
+                                        Boolean updateBookingPay = bookingController.updateBookingPay(
+                                                        bookingId, "checked-out", timeCheckout, amount);
+                                        if (updateBookingPay && updateStatusRoom) {
+                                                JOptionPane.showMessageDialog(null,
+                                                                "Thanh toán thành công! Chào thân ái",
+                                                                "Thông báo",
+                                                                JOptionPane.WARNING_MESSAGE);
+                                                bookingMain.refreshTable();
+                                                cardLayout.show(contentPanel, "bookingMainPanel");
+                                        }
+
+                                }
+
+                        } else {
+
+                                Double amount = bookingCheckOut.getTotalAmount();
+                                Double discountPrice = bookingCheckOut.getTotalDicount();
+
+                                Boolean checkedPayment = paymentController.createPayment(bookingId,
+                                                amount, "Cash");
+                                if (!checkedPayment) {
+                                        System.out.println("Tạo hóa đơn thất bại!");
+                                        Boolean changeStatus = paymentController.changeStatus(
+                                                        bookingId,
+                                                        "Failed");
+                                        return;
+                                } else {
+
+                                        Boolean updateStatusRoom = roomsController
+                                                        .updateRoomStatus(idRoom, "available");
+                                        Boolean updateBookingPay = bookingController.updateBookingPay(
+                                                        bookingId, "checked-out", timeCheckout, amount);
+                                        if (updateBookingPay && updateStatusRoom) {
+                                                JOptionPane.showMessageDialog(null,
+                                                                "Thanh toán thành công! Chào thân ái",
+                                                                "Thông báo",
+                                                                JOptionPane.WARNING_MESSAGE);
+                                                bookingMain.refreshTable();
+                                                cardLayout.show(contentPanel, "bookingMainPanel");
+
+                                        }
+                                }
+
+                        }
+
+                });
+                // hết sự kiện tạo hóa đơn khi nhấn trả phòng
+                // hết thêm voucher cho hóa đơn
+                // ra khỏi trang hóa đơn
+                bookingCheckOut.actionCancelBill(e -> {
+                        bookingCheckOut.clearAppVoucher();
+                        bookingCheckOut.clearSelectedTable();
+                        cardLayout.show(contentPanel, "bookingMainPanel");
+                });
+                // hếtsự kiện check-out
                 // hết booking
                 menuPanel.addManageEmployeeListener(e -> {
                         CardLayout cardLayout = (CardLayout) contentPanel.getLayout();
@@ -684,6 +1104,7 @@ public class mainDefault extends javax.swing.JFrame {
                         cardLayout.show(contentPanel, "servicePanel");
                 });
                 // hết dịch vụ
+
                 // Sự kiện xử lí nhân viên
                 employeeManagement.actionAddEmployee(e -> {
                         cardLayout.show(contentPanel, "employeeCreatePanel");
@@ -762,6 +1183,7 @@ public class mainDefault extends javax.swing.JFrame {
                         createEmployeePanel.clearData();
                         employeeManagement.refreshTable();
                 });
+
                 // menuPanel.addManageBillListener(e -> {
                 // CardLayout cardLayout = (CardLayout) contentPanel.getLayout();
                 // cardLayout.show(contentPanel, ""); // Hiển thị giao diện "Quản lý hóa đơn
@@ -870,12 +1292,11 @@ public class mainDefault extends javax.swing.JFrame {
                         }
                 });
                 // hết tính năng voucher
-                // menuPanel.profitManagement(e -> {
-                // // CardLayout cardLayout = (CardLayout) contentPanel.getLayout();
-                // // cardLayout.show(contentPanel, ""); // Hiển thị giao diện "Quản lý doanh
-                // thu
-                // // });
-                // });
+                menuPanel.profitManagement(e -> {
+                        CardLayout cardLayout = (CardLayout) contentPanel.getLayout();
+                        cardLayout.show(contentPanel, "revenuePanel"); // Hiển thị giao diện "Quản lý doanh thu
+
+                });
                 menuPanel.addExitListener(e -> {
                         System.exit(0); // Thoát ứng dụng
                 });

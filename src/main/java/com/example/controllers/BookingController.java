@@ -48,7 +48,7 @@ public class BookingController {
     // danh sách hóa đơn
     public List<Booking> listBooking() {
         String query = """
-                Select * from bookings where status = "pending"
+                Select * from bookings where status = 'pending'
                 """;
         List<Booking> bookings = new ArrayList<>();
         try (Connection conn = DBconnection.getConnection();

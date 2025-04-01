@@ -16,9 +16,10 @@ import com.example.models.Employee;
 public class EmployeeController {
 
     // Đăng nhập
-    public Boolean login(String email, String Inputpassword) {
+    public Employee login(String email, String Inputpassword) {
 
         String query = "SELECT * FROM employees WHERE email = ? and  isDeleted = 0";
+        Employee employee = null;
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, email);
@@ -26,7 +27,10 @@ public class EmployeeController {
             if (rs.next()) {
                 String passwordDatabase = rs.getString("password");
                 if (BCrypt.checkpw(Inputpassword, passwordDatabase)) {
-                    return true;
+                    employee = new Employee();
+                    employee.setId(rs.getInt("id"));
+                    employee.setFullName("FullName");
+                    return employee;
                 } else {
                     System.out.println("Sai mật khẩu!");
                 }
@@ -37,7 +41,7 @@ public class EmployeeController {
             e.printStackTrace();
         }
 
-        return false;
+        return employee;
 
     }
 
