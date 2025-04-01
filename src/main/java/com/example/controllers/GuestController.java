@@ -1,5 +1,6 @@
 package com.example.controllers;
 
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,13 +17,19 @@ public class GuestController {
     public Boolean createGuest(Guest guest) {
         String query = "INSERT into guests (fullName, email, phone, address) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBconnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(query)) {
+                PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, guest.getFullName());
             pstmt.setString(2, guest.getEmail());
             pstmt.setString(3, guest.getPhone());
             pstmt.setString(4, guest.getAddress());
-            int rs = pstmt.executeUpdate();
-            return rs > 0;
+            int createGuest = pstmt.executeUpdate();
+            if (createGuest > 0) {
+                ResultSet rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    guest.setId(rs.getInt(1)); // Lấy ID tự động sinh
+                }
+                return true;
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -31,31 +38,31 @@ public class GuestController {
     }
     // kết thúc tạo khách hàng
 
-
-    // Sửa thông tin khách hàng 
+    // Sửa thông tin khách hàng
     public Boolean updateGuest(Guest guest, int id) {
-        String query = "UPDATE guests SET fullName = COALESCE(?, fullName), " +
-                       "email = COALESCE(?, email), " +
-                       "phone = COALESCE(?, phone), " +
-                       "address = COALESCE(?, address), " +
-                       "updatedAt = CURRENT_TIMESTAMP " +
-                       "WHERE id = ?";
-    
+        String query = """
+                update guests set fullname =  COALESCE(?, fullname), phone = COALESCE(? , phone),
+                address = COALESCE(? ,address), email = COALESCE(?, email) where id = ? ;
+                """;
+
         try (Connection conn = DBconnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-    
-         
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
             Guest currentGuest = getGuestById(id);
             if (currentGuest == null) {
-                return false; 
+                return false;
             }
-    
-            pstmt.setString(1, guest.getFullName() != null && !guest.getFullName().isEmpty() ? guest.getFullName() : currentGuest.getFullName());
-            pstmt.setString(2, guest.getEmail() != null && !guest.getEmail().isEmpty() ? guest.getEmail() : currentGuest.getEmail());
-            pstmt.setString(3, guest.getPhone() != null && !guest.getPhone().isEmpty() ? guest.getPhone() : currentGuest.getPhone());
-            pstmt.setString(4, guest.getAddress() != null && !guest.getAddress().isEmpty() ? guest.getAddress() : currentGuest.getAddress());
+
+            pstmt.setString(1, guest.getFullName() != null && !guest.getFullName().isEmpty() ? guest.getFullName()
+                    : currentGuest.getFullName());
+            pstmt.setString(2, guest.getPhone() != null && !guest.getPhone().isEmpty() ? guest.getPhone()
+                    : currentGuest.getPhone());
+            pstmt.setString(3, guest.getAddress() != null && !guest.getAddress().isEmpty() ? guest.getAddress()
+                    : currentGuest.getAddress());
+            pstmt.setString(4, guest.getEmail() != null && !guest.getEmail().isEmpty() ? guest.getEmail()
+                    : currentGuest.getEmail());
             pstmt.setInt(5, id);
-    
+
             int rs = pstmt.executeUpdate();
             return rs > 0;
         } catch (SQLException e) {
@@ -63,14 +70,14 @@ public class GuestController {
         }
         return false;
     }
-    
-     // Lấy danh sách tất cả khách hàng
+
+    // Lấy danh sách tất cả khách hàng
     public List<Guest> getAllGuests() {
         List<Guest> guests = new ArrayList<Guest>();
         String query = "SELECT * FROM guests";
         try (Connection conn = DBconnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery()) {
+                PreparedStatement pstmt = conn.prepareStatement(query);
+                ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 Guest guest = new Guest();
@@ -86,11 +93,12 @@ public class GuestController {
         }
         return guests;
     }
-    // Lấy thông tin khách hàng qua id 
+
+    // Lấy thông tin khách hàng qua id
     public Guest getGuestById(int id) {
         String query = "SELECT * FROM guests WHERE id = ?";
         try (Connection conn = DBconnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -109,6 +117,4 @@ public class GuestController {
         return null;
     }
 
-
-    
 }

@@ -1,0 +1,15 @@
+========== HÓA ĐƠN THANH TOÁN ==========
+Mã hóa đơn: 40
+Tên khách hàng: Dinh Chan Kiet
+Số điện thoại: 0852560567
+Email: dinhkie2k4@gmail.com
+Số phòng: 501
+Loại phòng: Connecting Room
+Ngày check-in: 2025-03-23 01:27:36.0
+Ngày check-out: 2025-03-23 15:15:24.0
+Số ngày thuê: 1.0
+Tiền thuê phòng: 420000.0 VND
+Tiền dịch vụ: 0.0 VND
+Tổng tiền giảm giá: 0.0 VND
+Tổng tiền phải trả: 0.0 VND
+=========================================

@@ -1,0 +1,14 @@
+========== HÓA ĐƠN THANH TOÁN ==========
+Mã hóa đơn: 35
+Tên khách hàng: mi trau
+Số điện thoại: 
+Email: 
+Số phòng: 123
+Loại phòng: single room
+Ngày check-in: 2025-03-23 00:22:24.0
+Ngày check-out: null
+Số ngày thuê: 1
+Tiền thuê phòng: 120000.0 VND
+Tiền dịch vụ: 7.0 VND
+Tổng tiền phải trả: 120000.0 VND
+=========================================

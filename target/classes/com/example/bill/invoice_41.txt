@@ -1,0 +1,15 @@
+========== HÓA ĐƠN THANH TOÁN ==========
+Mã hóa đơn: 41
+Tên khách hàng: Dinh Chan Kiet
+Số điện thoại: 
+Email: 
+Số phòng: 503
+Loại phòng: Single Room
+Ngày check-in: 2025-03-23 15:28:13.0
+Ngày check-out: 2025-03-23 15:28:37.0
+Số ngày thuê: 1.0
+Tiền thuê phòng: 430000.0 VND
+Tiền dịch vụ: 0.0 VND
+Tổng tiền giảm giá: 0.0 VND
+Tổng tiền phải trả: 0.0 VND
+=========================================

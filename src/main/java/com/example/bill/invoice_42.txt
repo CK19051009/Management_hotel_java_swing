@@ -1,0 +1,15 @@
+========== HÓA ĐƠN THANH TOÁN ==========
+Mã hóa đơn: 42
+Tên khách hàng: Nguyen Duc Hieu
+Số điện thoại: 
+Email: 
+Số phòng: 509
+Loại phòng: Family Room
+Ngày check-in: 2025-03-25 12:57:13.0
+Ngày check-out: 2025-03-25 12:59:33.0
+Số ngày thuê: 1.0
+Tiền thuê phòng: 400000.0 VND
+Tiền dịch vụ: 300000.0 VND
+Tổng tiền giảm giá: 120000.0 VND
+Tổng tiền phải trả: 580000.0 VND
+=========================================

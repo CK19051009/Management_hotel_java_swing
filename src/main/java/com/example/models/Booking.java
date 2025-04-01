@@ -1,6 +1,5 @@
 package com.example.models;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 
 public class Booking {
@@ -9,8 +8,8 @@ public class Booking {
     private int employeeId;
     private int voucherId;
     private int guestId;
-    private Date checkIn;
-    private Date checkOut;
+    private Timestamp checkIn;
+    private Timestamp checkOut;
     private double totalAmount = 0.0;
     private double depositAmount = 0.0;
     private String paymentStatus;
@@ -23,7 +22,7 @@ public class Booking {
 
     // Getters và Setters
 
-    public Booking(int roomId, int employeeId, int voucherId, int guestId, Date checkIn, Date checkOut,
+    public Booking(int roomId, int employeeId, int voucherId, int guestId, Timestamp checkIn, Timestamp checkOut,
             double totalAmount, double depositAmount, String paymentStatus, String status, Timestamp createdAt,
             Timestamp updatedAt) {
         this.roomId = roomId;
@@ -40,7 +39,8 @@ public class Booking {
         this.updatedAt = updatedAt;
     }
 
-    public Booking(int id, int roomId, int employeeId, int voucherId, int guestId, Date checkIn, Date checkOut,
+    public Booking(int id, int roomId, int employeeId, int voucherId, int guestId, Timestamp checkIn,
+            Timestamp checkOut,
             double totalAmount, double depositAmount, String paymentStatus, String status, Timestamp createdAt,
             Timestamp updatedAt) {
         this.id = id;
@@ -56,6 +56,14 @@ public class Booking {
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public Booking(int roomId, int guestId, Timestamp checkIn, double depositAmount) {
+        this.roomId = roomId;
+        this.guestId = guestId;
+        this.checkIn = checkIn;
+        this.depositAmount = depositAmount;
+
     }
 
     public double getDepositAmount() {
@@ -114,19 +122,19 @@ public class Booking {
         this.guestId = guestId;
     }
 
-    public Date getCheckIn() {
+    public Timestamp getCheckIn() {
         return checkIn;
     }
 
-    public void setCheckIn(Date checkIn) {
+    public void setCheckIn(Timestamp checkIn) {
         this.checkIn = checkIn;
     }
 
-    public Date getCheckOut() {
+    public Timestamp getCheckOut() {
         return checkOut;
     }
 
-    public void setCheckOut(Date checkOut) {
+    public void setCheckOut(Timestamp checkOut) {
         this.checkOut = checkOut;
     }
 
@@ -164,10 +172,11 @@ public class Booking {
 
     @Override
     public String toString() {
-        return "Booking [id=" + id + ", roomId=" + roomId + ", employeeId=" + employeeId + ", voucherId=" + voucherId
-                + ", guestId=" + guestId + ", checkIn=" + checkIn + ", checkOut=" + checkOut + ", totalAmount="
+        return "Booking [id =" + id + ", roomId =" + roomId + ", employeeId =" + employeeId + ", voucherId ="
+                + voucherId
+                + ", guestId =" + guestId + ", checkIn =" + checkIn + ", checkOut =" + checkOut + ", totalAmount="
                 + totalAmount + ", depositAmount=" + depositAmount + ", paymentStatus=" + paymentStatus + ", status="
-                + status + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + "]";
+                + status + ", createdAt =" + createdAt + ", updatedAt =" + updatedAt + "]";
     }
 
 }
