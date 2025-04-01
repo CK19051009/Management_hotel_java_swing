@@ -22,7 +22,7 @@ public class PayrollController {
                        "WHERE MONTH(WorkDate) = ? AND YEAR(WorkDate) = ? " +
                        "GROUP BY EmployeeID " +
                        "ON DUPLICATE KEY UPDATE TotalSalary = VALUES(TotalSalary)";
-        
+                        
         try (Connection conn = DBconnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             
