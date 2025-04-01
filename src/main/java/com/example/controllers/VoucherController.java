@@ -172,5 +172,157 @@ public class VoucherController {
 
         return false;
     }
+
+    public List<Voucher> getVouchersByStatus(String status) {
+        List<Voucher> vouchers = new ArrayList<>();
+        String query = "SELECT * FROM vouchers WHERE LOWER(status) = LOWER(?) AND isDeleted = 0";
+    
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            pstmt.setString(1, status);
+            ResultSet result = pstmt.executeQuery();
+    
+            while (result.next()) {
+                Voucher voucher = new Voucher();
+                voucher.setId(result.getInt("id"));
+                voucher.setCode(result.getString("code"));
+                voucher.setDescription(result.getString("description"));
+                voucher.setDiscountType(result.getString("discountType"));
+                voucher.setDiscountValue(result.getDouble("discountValue"));
+                voucher.setMinOrderValue(result.getDouble("minOrderValue"));
+                voucher.setMaxDiscountValue(result.getDouble("maxDiscountValue"));
+                voucher.setStartDate(result.getDate("startDate"));
+                voucher.setEndDate(result.getDate("endDate"));
+                voucher.setStatus(result.getString("status"));
+                voucher.setUsageLimit(result.getInt("usageLimit"));
+                voucher.setUsedCount(result.getInt("usedCount"));
+                vouchers.add(voucher);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vouchers;
+    }
+    
+    // Lấy ra voucher cũ nhất
+    public List<Voucher> getVouchersSortedByOldest() {
+        String query = "SELECT * FROM vouchers WHERE isDeleted = 0 ORDER BY startDate ASC";
+        List<Voucher> vouchers = new ArrayList<>();
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Voucher voucher = new Voucher();
+                voucher.setId(rs.getInt("id"));
+                voucher.setCode(rs.getString("code"));
+                voucher.setDescription(rs.getString("description"));
+                voucher.setDiscountType(rs.getString("discountType"));
+                voucher.setDiscountValue(rs.getDouble("discountValue"));
+                voucher.setMinOrderValue(rs.getDouble("minOrderValue"));
+                voucher.setMaxDiscountValue(rs.getDouble("maxDiscountValue"));
+                voucher.setStatus(rs.getString("status"));
+                voucher.setStartDate(rs.getDate("startDate"));
+                voucher.setEndDate(rs.getDate("endDate"));
+                voucher.setUsageLimit(rs.getInt("usageLimit"));
+                vouchers.add(voucher);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vouchers;
+    }
+    
+    // Lấy voucher ngày mới nhất
+    public List<Voucher> getVouchersSortedByNewest() {
+        String query = "SELECT * FROM vouchers WHERE isDeleted = 0 ORDER BY startDate DESC";
+        List<Voucher> vouchers = new ArrayList<>();
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Voucher voucher = new Voucher();
+                voucher.setId(rs.getInt("id"));
+                voucher.setCode(rs.getString("code"));
+                voucher.setDescription(rs.getString("description"));
+                voucher.setDiscountType(rs.getString("discountType"));
+                voucher.setDiscountValue(rs.getDouble("discountValue"));
+                voucher.setMinOrderValue(rs.getDouble("minOrderValue"));
+                voucher.setMaxDiscountValue(rs.getDouble("maxDiscountValue"));
+                voucher.setStatus(rs.getString("status"));
+                voucher.setStartDate(rs.getDate("startDate"));
+                voucher.setEndDate(rs.getDate("endDate"));
+                voucher.setUsageLimit(rs.getInt("usageLimit"));
+                vouchers.add(voucher);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vouchers;
+    }
+
+    
+    // lấy ra giá trị vouchẻ cao nhấtnhất
+    public Voucher getHighestDiscountVoucher() {
+        String query = "SELECT * FROM vouchers WHERE isDeleted = 0 ORDER BY discountValue DESC LIMIT 1";
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                Voucher voucher = new Voucher();
+                voucher.setId(rs.getInt("id"));
+                voucher.setCode(rs.getString("code"));
+                voucher.setDescription(rs.getString("description"));
+                voucher.setDiscountType(rs.getString("discountType"));
+                voucher.setDiscountValue(rs.getDouble("discountValue"));
+                voucher.setMinOrderValue(rs.getDouble("minOrderValue"));
+                voucher.setMaxDiscountValue(rs.getDouble("maxDiscountValue"));
+                voucher.setStatus(rs.getString("status"));
+                voucher.setStartDate(rs.getDate("startDate"));
+                voucher.setEndDate(rs.getDate("endDate"));
+                voucher.setUsageLimit(rs.getInt("usageLimit"));
+                return voucher; 
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; 
+    }
+    // tìm kiếm theo mãmã
+    public List<Voucher> searchVouchersByCode(String voucherCode) {
+        List<Voucher> vouchers = new ArrayList<>();
+        String query = "SELECT * FROM vouchers WHERE LOWER(code) LIKE LOWER(?) AND isDeleted = 0";
+    
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            pstmt.setString(1, "%" + voucherCode + "%"); 
+            ResultSet result = pstmt.executeQuery();
+    
+            while (result.next()) {
+                Voucher voucher = new Voucher();
+                voucher.setId(result.getInt("id"));
+                voucher.setCode(result.getString("code"));
+                voucher.setDescription(result.getString("description"));
+                voucher.setDiscountType(result.getString("discountType"));
+                voucher.setDiscountValue(result.getDouble("discountValue"));
+                voucher.setMinOrderValue(result.getDouble("minOrderValue"));
+                voucher.setMaxDiscountValue(result.getDouble("maxDiscountValue"));
+                voucher.setStartDate(result.getDate("startDate"));
+                voucher.setEndDate(result.getDate("endDate"));
+                voucher.setStatus(result.getString("status"));
+                voucher.setUsageLimit(result.getInt("usageLimit"));
+                voucher.setUsedCount(result.getInt("usedCount"));
+                vouchers.add(voucher);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vouchers;
+    }
+    
 }
 // hết chỉnh sửa voucher

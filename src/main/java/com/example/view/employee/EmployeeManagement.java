@@ -56,10 +56,35 @@ public class EmployeeManagement {
 
                 // ComboBox trạng thái
                 statusComboBox.setModel(
-                                new DefaultComboBoxModel<>(new String[] { "Tất cả", "Hoạt động", "Nghỉ việc" }));
+                                new DefaultComboBoxModel<>(new String[] { "Tất cả", "Hoạt động", "Nghỉ việc","Đình chỉ" }));
                 statusComboBox.setPreferredSize(new Dimension(150, 25));
                 topPanel.add(statusComboBox);
-
+                statusComboBox.addActionListener(e -> {
+                        String selectedStatus = (String) statusComboBox.getSelectedItem();
+                        String dbStatus = null;
+                    
+                        // Chuyển đổi trạng thái từ UI sang giá trị trong DB
+                        switch (selectedStatus) {
+                            case "Tất cả":
+                                refreshTable(); // Hiển thị tất cả nhân viên
+                                return;
+                            case "Hoạt động":
+                                dbStatus = "active";
+                                break;
+                            case "Nghỉ việc":
+                                dbStatus = "inactive";
+                                break;
+                            case "Đình chỉ":
+                                dbStatus = "suspended";
+                                break;
+                        }
+                    
+                        if (dbStatus != null) {
+                            List<Employee> filteredEmployees = employeeController.getEmployeesByStatus(dbStatus);
+                            refreshTable(filteredEmployees);
+                        }
+                    });
+                    
                 // Trường tìm kiếm
                 searchField.setPreferredSize(new Dimension(150, 25));
                 topPanel.add(searchField);
@@ -69,12 +94,40 @@ public class EmployeeManagement {
                 searchButton.setForeground(Color.WHITE);
                 searchButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
                 topPanel.add(searchButton);
-
+                searchButton.addActionListener(e -> {
+                        String nameKeyword = searchField.getText().trim();  
+                        if (nameKeyword.isEmpty()) {
+                            refreshTable();
+                        } else {
+                           
+                            List<Employee> employees = employeeController.getEmployeesByName(nameKeyword);
+                            refreshTable(employees); 
+                        }
+                    });
+                    
                 // ComboBox sắp xếp
                 sortComboBox.setModel(new DefaultComboBoxModel<>(
                                 new String[] { "Tên A-Z", "Tên Z-A", "Cấp bậc tăng dần", "Cấp bậc giảm dần" }));
                 sortComboBox.setPreferredSize(new Dimension(150, 25));
                 topPanel.add(sortComboBox);
+                sortButton.addActionListener(e -> {
+                        String selectedSortOption = (String) sortComboBox.getSelectedItem();
+                        boolean isAscending;     
+                        switch (selectedSortOption) {
+                            case "Cấp bậc tăng dần":
+                                isAscending = true;
+                                break;
+                            case "Cấp bậc giảm dần":
+                                isAscending = false;
+                                break;
+                            default:
+                                return; 
+                        }
+                        List<Employee> sortedEmployees = employeeController.getEmployeesByLevelUser(isAscending);
+                        refreshTable(sortedEmployees);
+                    });
+                    
+
 
                 // Nút áp dụng sắp xếp
                 sortButton.setBackground(new Color(30, 60, 90));
@@ -160,7 +213,15 @@ public class EmployeeManagement {
                 employeeTable.revalidate();
                 employeeTable.repaint();
         }
-
+        // duyệt list cho nhanh
+        public void refreshTable(List<Employee> employees) {
+                tableModel.setRowCount(0); 
+                for (Employee employee : employees) {
+                    addEmployeeToTable(employee);
+                }
+                employeeTable.revalidate();
+                employeeTable.repaint();
+            }
         private void addEmployeeToTable(Employee employee) {
                 tableModel.addRow(new Object[] {
                                 employee.getId(),

@@ -17,6 +17,9 @@ import com.example.controllers.ServiceController;
 import com.example.helper.Item;
 import com.example.models.Room;
 import com.example.models.Service;
+import java.awt.event.ActionEvent; 
+import java.awt.event.ActionListener;  
+
 
 public class ServicePanel {
 
@@ -69,20 +72,22 @@ public class ServicePanel {
                                                 }));
 
                 filedService.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+                JcStatusService.addActionListener(this::JcStatusServiceActionPerformed);
 
                 btnSearchService.setBackground(new java.awt.Color(30, 60, 90));
                 btnSearchService.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
                 btnSearchService.setForeground(new java.awt.Color(255, 255, 255));
                 btnSearchService.setText("Tìm kiếm");
-
+                btnSearchService.addActionListener(e -> searchService());
                 jcSortService.setModel(
                                 new javax.swing.DefaultComboBoxModel<>(
-                                                new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+                                                new String[] { "---Chọn thứ tự sắp xếp---",  "Giá tăng dần", "Giá giảm dần" }));
 
                 btnSortService.setBackground(new java.awt.Color(30, 60, 90));
                 btnSortService.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
                 btnSortService.setForeground(new java.awt.Color(255, 255, 255));
                 btnSortService.setText("Áp dụng");
+                btnSortService.addActionListener(e -> applySort());
 
                 btnEditSerivce.setBackground(new java.awt.Color(153, 255, 153));
                 btnEditSerivce.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -288,4 +293,41 @@ public class ServicePanel {
                 tableRoom1.repaint();
         }
         // public
+
+
+        private void applySort() {
+                boolean ascending = jcSortService.getSelectedIndex() == 1;
+                List<Service> sortedRooms = serviceController.getServiceByPrice(ascending);
+                tableModel.setRowCount(0);
+                for (Service service : sortedRooms) {
+                    addRoom(service, tableModel);
+                }
+            }
+            private void searchService() {
+                String serviceName = filedService.getText();
+                   List<Service> service = serviceController.getServiceByKeyword(serviceName);
+                    tableModel.setRowCount(0);
+                    if (service != null) {
+                       for (Service a: service)
+                        addRoom(a, tableModel) ; 
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Không tìm thấy dịch vụ!");
+                    }
+                
+            }
+            private void JcStatusServiceActionPerformed(ActionEvent evt) {
+                Item selectedItem = (Item) JcStatusService.getSelectedItem();
+                List<Service> serviceStatus = serviceController.getServicesByStatus(selectedItem.getKey());
+                tableModel.setRowCount(0);
+                if (selectedItem.getKey().equals("all")) {
+                    refreshTable();
+                } else {
+                    for (Service a : serviceStatus) {
+                        addRoom(a, tableModel);
+                    }
+                }
+            }
+            
+            
+        
 }
