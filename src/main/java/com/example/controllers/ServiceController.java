@@ -64,7 +64,7 @@ public class ServiceController {
         String query = """
                 update services set name = COALESCE(?, name), description = COALESCE(?, description),
                 price = COALESCE(?, price),
-                status = COALESCE(?, status) where id = ?
+                status = COALESCE(?, status) where id = ? AND isDeleted = 0
                 """;
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -90,7 +90,7 @@ public class ServiceController {
 
     // Tìm dịch vụ qua id
     public Service getServiceById(int id) {
-        String query = "SELECT * FROM services WHERE id = ?";
+        String query = "SELECT * FROM services WHERE id = ? AND isDeleted = 0 ";
         try (Connection conn = DBconnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setInt(1, id);
@@ -130,4 +130,87 @@ public class ServiceController {
         return false;
     }
 
+    public List<Service> getServiceByPrice(boolean ascending) {
+        List<Service> services = new ArrayList<Service>();
+        String order = ascending ? "ASC" : "DESC";
+        String query = "SELECT * FROM services where isDeleted = 0 ORDER BY price " + order;
+        try (Connection conn = DBconnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query);
+                ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Service service = new Service();
+                service.setId(rs.getInt("id"));
+                service.setName(rs.getString("name"));
+                service.setPrice(rs.getDouble("price"));
+                service.setDescription(rs.getString("description"));
+                service.setStatus(rs.getString("status"));
+                services.add(service);
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return services;
+    }
+
+    public List<Service> getServicesByStatus(String status) {
+        List<Service> services = new ArrayList<Service>();
+        String query = "SELECT * FROM services WHERE isDeleted = 0 AND status = ?";
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+             
+            pstmt.setString(1, status); 
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Service service = new Service();
+                    service.setId(rs.getInt("id"));
+                    service.setName(rs.getString("name"));
+                    service.setPrice(rs.getDouble("price"));
+                    service.setDescription(rs.getString("description"));
+                    service.setStatus(rs.getString("status"));
+                    services.add(service);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return services;
+    }
+    public List<Service> getServiceByKeyword(String keyword) {
+        String query = "SELECT * FROM services WHERE LOWER(name) LIKE LOWER(?) AND isDeleted = 0 ORDER BY name ASC";  
+        List<Service> serviceList = new ArrayList<>();
+    
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            pstmt.setString(1, "%" + keyword.toLowerCase() + "%");  
+            ResultSet rs = pstmt.executeQuery();
+    
+            while (rs.next()) {
+                Service service = new Service();
+                service.setId(rs.getInt("id"));
+                service.setName(rs.getString("name"));
+                service.setPrice(rs.getDouble("price"));
+                service.setDescription(rs.getString("description"));
+                service.setStatus(rs.getString("status"));
+                serviceList.add(service);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return serviceList;
+    }
+    
+    
+
+public static void main(String[] args) {
+    ServiceController c = new ServiceController();
+    List<Service> a = c.getServiceByPrice(false) ;
+    for (Service service : a) {
+        System.out.println(service.getPrice());
+    }
+    
+}
 }

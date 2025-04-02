@@ -4,6 +4,7 @@ import com.example.controllers.EmployeeController;
 import com.example.models.Employee;
 // import com.example.view.room.Calculator_frame;
 import com.example.view.default_main.MainDefault;
+import com.example.view.register.Signup_Form;
 import com.example.view.room.mainDefault;
 
 /**
@@ -313,6 +314,11 @@ public class Login_Form extends javax.swing.JFrame {
                                                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                 javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
 
+                Signup_Form signup_Form = new Signup_Form();
+                buttonSignUp.addActionListener(e -> {
+                        signup_Form.setVisible(true);
+                        dispose();
+                });
                 pack();
                 setLocationRelativeTo(null);
         }// </editor-fold>//GEN-END:initComponents

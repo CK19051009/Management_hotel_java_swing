@@ -231,4 +231,95 @@ public class EmployeeController {
         }
         return false; // Trả về false nếu không có lỗi
     }
+
+    // Lấy thông tin theo trạng thái
+    public List<Employee> getEmployeesByStatus(String status) {
+        List<Employee> employees = new ArrayList<>();
+        String query = "SELECT * FROM employees WHERE LOWER(Status) = LOWER(?) AND isDeleted = 0";
+    
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+    
+            pstmt.setString(1, status); 
+            ResultSet rs = pstmt.executeQuery();
+    
+            while (rs.next()) {
+                Employee employee = new Employee();
+                employee.setId(rs.getInt("ID"));
+                employee.setUserName(rs.getString("UserName"));
+                employee.setFullName(rs.getString("FullName"));
+                employee.setEmail(rs.getString("Email"));
+                employee.setPassword(rs.getString("Password"));
+                employee.setThumbnail(rs.getString("Thumbnail"));
+                employee.setLevelUser(rs.getString("LevelUser"));
+                employee.setStatus(rs.getString("Status"));
+                employees.add(employee);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return employees;
+    }
+
+    public List<Employee> getEmployeesByLevelUser(boolean isAscending) {
+        List<Employee> employees = new ArrayList<>();
+        String query = "SELECT * FROM employees WHERE isDeleted = 0 ORDER BY FIELD(LevelUser, 'staff', 'manager', 'admin')";
+    
+        
+        if (!isAscending) {
+            query = "SELECT * FROM employees WHERE isDeleted = 0 ORDER BY FIELD(LevelUser, 'admin', 'manager', 'staff')";
+        }
+    
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+    
+            ResultSet rs = pstmt.executeQuery();
+    
+            while (rs.next()) {
+                Employee employee = new Employee();
+                employee.setId(rs.getInt("ID"));
+                employee.setUserName(rs.getString("UserName"));
+                employee.setFullName(rs.getString("FullName"));
+                employee.setEmail(rs.getString("Email"));
+                employee.setPassword(rs.getString("Password"));
+                employee.setThumbnail(rs.getString("Thumbnail"));
+                employee.setLevelUser(rs.getString("LevelUser"));
+                employee.setStatus(rs.getString("Status"));
+                employees.add(employee);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return employees;
+    }
+    // Lấy theo têntên
+    public List<Employee> getEmployeesByName(String nameKeyword) {
+        List<Employee> employees = new ArrayList<>();
+        String query = "SELECT * FROM employees WHERE isDeleted = 0 AND LOWER(FullName) LIKE LOWER(?)";
+    
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+    
+            pstmt.setString(1, "%" + nameKeyword + "%"); 
+    
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Employee employee = new Employee();
+                employee.setId(rs.getInt("ID"));
+                employee.setUserName(rs.getString("UserName"));
+                employee.setFullName(rs.getString("FullName"));
+                employee.setEmail(rs.getString("Email"));
+                employee.setPassword(rs.getString("Password"));
+                employee.setThumbnail(rs.getString("Thumbnail"));
+                employee.setLevelUser(rs.getString("LevelUser"));
+                employee.setStatus(rs.getString("Status"));
+                employees.add(employee);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return employees;
+    }
+    
+    
 }

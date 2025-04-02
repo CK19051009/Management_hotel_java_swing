@@ -263,4 +263,83 @@ public class RoomsController {
         return rooms;
     }
     // hết lấy ra danh sách phòng dựa trên trạng thái
+
+// Sắp xếp theo giá phòng, truyền true giá tăng dần, false giá giảm dần
+ 
+    public List<Room> listRoomsSortedByPrice(boolean ascending) {
+        List<Room> rooms = new ArrayList<>();
+        String order = ascending ? "ASC" : "DESC";
+        String query = "SELECT * FROM rooms WHERE isDeleted = 0 ORDER BY price " + order;
+        
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Room room = new Room();
+                room.setId(rs.getInt("id"));
+                room.setRoomNumber(rs.getInt("roomNumber"));
+                room.setRoomType(rs.getString("type"));
+                room.setStatus(rs.getString("status"));
+                room.setPrice(rs.getInt("price"));
+                room.setThumbnail(rs.getString("thumbnail"));
+                room.setDescription(rs.getString("description"));
+                room.setCapacity(rs.getInt("capacity"));
+                room.setPosition(rs.getInt("position"));
+                rooms.add(room);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return rooms;
+    }
+    
+
+   public List<Room> getRoomsByNumberPrefix(int prefix) {
+    List<Room> rooms = new ArrayList<>();
+    String query = "SELECT * FROM rooms WHERE isDeleted = 0 AND roomNumber LIKE ?";
+    
+    try (Connection conn = DBconnection.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(query)) {
+        pstmt.setString(1, prefix + "%");  
+        ResultSet rs = pstmt.executeQuery();
+        
+        while (rs.next()) {
+            Room room = new Room();
+            room.setId(rs.getInt("id"));
+            room.setRoomNumber(rs.getInt("roomNumber"));
+            room.setRoomType(rs.getString("type"));
+            room.setStatus(rs.getString("status"));
+            room.setPrice(rs.getInt("price"));
+            room.setThumbnail(rs.getString("thumbnail"));
+            room.setDescription(rs.getString("description"));
+            room.setCapacity(rs.getInt("capacity"));
+            room.setPosition(rs.getInt("position"));
+            
+            rooms.add(room);
+        }
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return rooms;
+}
+
+
+
+
+
+    public static void main(String[] args) {
+        RoomsController roomDAO = new RoomsController();
+        List<Room> sortedRooms = roomDAO.listRoomsSortedByPrice(true);
+        
+        System.out.println("Rooms sorted by price (ascending):");
+        for (Room room : sortedRooms) {
+            System.out.println("Room ID: " + room.getId() + ", Price: " + room.getPrice());
+        }
+       
+    }
 }

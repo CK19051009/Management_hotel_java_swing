@@ -76,6 +76,7 @@ public class RoomMain {
                 // Nút tìm kiếm
                 btnSearchRoom.setBackground(new Color(30, 60, 90));
                 btnSearchRoom.setForeground(Color.WHITE);
+                btnSearchRoom.addActionListener(e -> searchRoom());
                 btnSearchRoom.setFont(new Font("Segoe UI", Font.BOLD, 12));
                 topRoomPanel.add(btnSearchRoom);
 
@@ -83,6 +84,7 @@ public class RoomMain {
                 jcSortRoom.setModel(new DefaultComboBoxModel<>(new String[] {
                                 "---Chọn thứ tự sắp xếp---", "Giá tăng dần", "Giá giảm dần"
                 }));
+                btnSortRoom.addActionListener(e -> applySort());
                 topRoomPanel.add(jcSortRoom);
 
                 // Nút áp dụng sắp xếp
@@ -201,4 +203,35 @@ public class RoomMain {
         public void actionDeleteRoom(ActionListener e) {
                 btnDeleteRoom.addActionListener(e);
         }
+
+        public void applySort() {
+                boolean ascending = jcSortRoom.getSelectedIndex() == 1;
+                List<Room> sortedRooms = roomsController.listRoomsSortedByPrice(ascending);
+                tableModel.setRowCount(0);
+                for (Room room : sortedRooms) {
+                    addRoom(room, tableModel);
+                }
+            }
+
+            // Tìm kiếm theo số phòng
+    public void searchRoom() {
+        String roomNumberStr = filedSearchRoom.getText();
+        try {
+            int roomNumber = Integer.parseInt(roomNumberStr);
+            List<Room> room = roomsController.getRoomsByNumberPrefix(roomNumber);
+            tableModel.setRowCount(0);
+            if (room != null) {
+                for (Room r : room) {
+                addRoom(r, tableModel); }
+            } else {
+                JOptionPane.showMessageDialog(null, "Không tìm thấy phòng!");
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Vui lòng nhập số phòng hợp lệ.");
+        }
+    }
+
+    
+
+        
 }

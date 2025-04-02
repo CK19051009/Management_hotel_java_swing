@@ -61,6 +61,26 @@ public class VoucherMainPanel {
                 JcStatusVoucher.setModel(new DefaultComboBoxModel<>(new String[] { "Tất cả", "Hoạt động", "Hết hạn" }));
                 JcStatusVoucher.setPreferredSize(new Dimension(150, 30));
                 topVoucherPanel.add(JcStatusVoucher);
+                JcStatusVoucher.addActionListener(e -> {
+                        String selectedStatus = (String) JcStatusVoucher.getSelectedItem();
+                        
+                        // Chuyển trạng thái từ tiếng Việt sang giá trị trong database
+                        String dbStatus = null;
+                        if ("Hoạt động".equals(selectedStatus)) {
+                            dbStatus = "active";
+                        } else if ("Hết hạn".equals(selectedStatus)) {
+                            dbStatus = "inactive";
+                        }
+                    
+                        if (dbStatus == null) {
+                            refreshTable(); 
+                        } else {
+                            filterVouchersByStatus(dbStatus); 
+                        }
+                    });
+                    
+                    
+
 
                 filedVoucher.setPreferredSize(new Dimension(200, 30));
                 topVoucherPanel.add(filedVoucher);
@@ -69,17 +89,52 @@ public class VoucherMainPanel {
                 btnSearchVoucher.setForeground(Color.WHITE);
                 btnSearchVoucher.setFont(new Font("Segoe UI", Font.BOLD, 12));
                 topVoucherPanel.add(btnSearchVoucher);
+               
+                btnSearchVoucher.addActionListener(e -> {      
+        String searchText = filedVoucher.getText().toLowerCase();
+
+        
+        if (searchText.length() != 00) {
+            List<Voucher> vouchers = voucherController.searchVouchersByCode(searchText);
+            tableModel.setRowCount(0);  
+            for (Voucher voucher : vouchers) {
+                    addRoom(voucher, tableModel);
+            } 
+        } else {
+            refreshTable();  
+        }
+    });
+    
 
                 jcSortVoucher.setModel(
                                 new DefaultComboBoxModel<>(new String[] { "Mới nhất", "Cũ nhất", "Giá trị cao nhất" }));
                 jcSortVoucher.setPreferredSize(new Dimension(150, 30));
                 topVoucherPanel.add(jcSortVoucher);
+               
 
                 btnSortVoucher.setBackground(new Color(30, 60, 90));
                 btnSortVoucher.setForeground(Color.WHITE);
                 btnSortVoucher.setFont(new Font("Segoe UI", Font.BOLD, 12));
                 topVoucherPanel.add(btnSortVoucher);
-
+                btnSortVoucher.addActionListener(e -> {
+                       
+                      
+                        String selectedSortOption = (String) jcSortVoucher.getSelectedItem();
+                        switch (selectedSortOption) {
+                            case "Mới nhất":
+                                sortVouchersByNewest();
+                                break;
+                            case "Cũ nhất":
+                                sortVouchersByOldest();
+                                break;
+                            case "Giá trị cao nhất":
+                                sortVouchersByHighestValue();
+                                break;
+                            default:
+                                refreshTable(); 
+                                break;
+                        }
+                    });
                 btnDeleteVoucher.setBackground(new Color(255, 0, 51));
                 btnDeleteVoucher.setForeground(Color.WHITE);
                 btnDeleteVoucher.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -183,7 +238,7 @@ public class VoucherMainPanel {
         }
 
         public void refreshTable() {
-                tableModel.setRowCount(0); // Xóa dữ liệu cũ trong bảng
+                tableModel.setRowCount(0); 
                 List<Voucher> vouchers = voucherController.listVouchers();
                 for (Voucher voucher : vouchers) {
                         addRoom(voucher, tableModel); // Thêm từng phòng vào bảng
@@ -214,4 +269,45 @@ public class VoucherMainPanel {
 
                 return voucher;
         }
+
+        private void filterVouchersByStatus(String status) {
+                tableModel.setRowCount(0); 
+            
+                List<Voucher> vouchers = voucherController.getVouchersByStatus(status);
+                for (Voucher voucher : vouchers) {
+                    addRoom(voucher, tableModel);
+                }
+                
+                tableVoucher.revalidate();
+                tableVoucher.repaint();
+            }
+
+            private void sortVouchersByNewest() {
+                tableModel.setRowCount(0); 
+                List<Voucher> vouchers = voucherController.getVouchersSortedByNewest();
+                for (Voucher voucher : vouchers) {
+                    addRoom(voucher, tableModel); 
+                }
+                
+            }
+            
+            private void sortVouchersByOldest() {
+                tableModel.setRowCount(0); 
+                List<Voucher> vouchers = voucherController.getVouchersSortedByOldest();
+                for (Voucher voucher : vouchers) {
+                    addRoom(voucher, tableModel); 
+                }
+              
+            }
+            
+            private void sortVouchersByHighestValue() {
+                tableModel.setRowCount(0); 
+                Voucher vouchers = voucherController.getHighestDiscountVoucher();
+                
+                    addRoom(vouchers, tableModel);
+                
+            }
+            
+           
+            
 }
